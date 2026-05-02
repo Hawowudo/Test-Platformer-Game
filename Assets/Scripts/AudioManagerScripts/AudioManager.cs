@@ -13,7 +13,7 @@ public class AudioManager : MonoBehaviour
     public AudioFileLibraryScriptableObject SFX;
     public AudioFileLibraryScriptableObject Characters;
     public AudioFileLibraryScriptableObject Music;
-    private Sound[] soundLibrary;
+    private List<Sound> soundLibrary = new List<Sound>();
 
 
     public bool DebugMode;
@@ -41,19 +41,21 @@ public class AudioManager : MonoBehaviour
     {
         if (instance != null)
         {
-            Destroy(this);
+            Destroy(this.gameObject);
             return;
         }
         instance = this;
 
-        //Add all the sounds here:
+    }
+    private void Start()
+    {
         AddToSounds(SFX.AudioLibrary);
         AddToSounds(Characters.AudioLibrary);
         AddToSounds(Music.AudioLibrary);
 
         SetupSounds();
-        DontDestroyOnLoad(this.gameObject);
         SetNewVolumeValues(GetSavedVolumeValues());
+
     }
     private void Update()
     {
@@ -130,7 +132,6 @@ public class AudioManager : MonoBehaviour
             SoundType librarySoundType = GetLibraryOfSoundName(s.soundClipAudioSource.clip.name).AudioLibrarySoundType;
             s.soundClipAudioSource.volume = FindSoundInReferenceLibrary(s.soundName).volume * currentVolumeValues.masterVolume * GetSoundTypeVolume(librarySoundType);
         }
-
     }
     AudioFileLibraryScriptableObject GetLibraryOfSoundName(string name)
     {
@@ -192,11 +193,12 @@ public class AudioManager : MonoBehaviour
             soundsInSoundsArray.Add(s.sound);
         }
 
-        soundLibrary = soundsInSoundsArray.ToArray();
+        soundLibrary = soundsInSoundsArray;
     }
     void SetupSounds()
     {
-        //if there's thousands of sounds, it might cause some performance issues, but for a reasonable amount of sounds it should be fine. If performance becomes an issue, consider using coroutine to load the sounds over multiple frames.
+        //if there's thousands of sounds, it might cause some performance issues, but for a reasonable amount of sounds it should be fine.
+        //If performance becomes an issue, consider using coroutine to load the sounds over multiple frames.
         foreach (Sound s in soundLibrary)
         {
             if (s.source == null)
@@ -237,7 +239,7 @@ public class AudioManager : MonoBehaviour
     }
     #endregion
 
-    //Use this function for single instance audio clips, ie footsteps, gunshots, etc. that can be played multiple times at once without cutting each other off.
+    //Use this function for single instance audio clips, like footsteps, gunshots, and the type of stuff that can be played multiple times at once without cutting each other off.
     //For music , or clips that should not be played multiple times at once, use PlayAudioClipUnique
     public void PlayAudioClipInstance(SoundClipInfo soundClipInfo)
     {
@@ -544,25 +546,16 @@ namespace AudioManagerPackage
         [Range(0, 1)]
         public float sfxVolume = 1;
         [Range(0, 1)]
-        public float ambienceVolume = 1;
-        [Range(0, 1)]
         public float characterVolume = 1;
         [Range(0, 1)]
-        public float monsterVolume = 1;
-        [Range(0, 1)]
         public float musicVolume = 1;
-        [Range(0, 1)]
-        public float jumpscaresVolume = 1;
 
-        public VolumeValues(float masterVolume = 0.1f, float sfxVolume = 1,  float ambienceVolume = 1, float characterVolume = 1, float monsterVolume = 1,  float musicVolume = 1, float jumpscaresVolume = 1)
+        public VolumeValues(float masterVolume = 0.1f, float sfxVolume = 1,   float characterVolume = 1,   float musicVolume = 1)
         {
             this.masterVolume = masterVolume;
             this.sfxVolume = sfxVolume;
-            this.ambienceVolume = ambienceVolume;
             this.characterVolume = characterVolume;
-            this.monsterVolume = monsterVolume;
             this.musicVolume = musicVolume;
-            this.jumpscaresVolume = jumpscaresVolume;
         }
     }
 }
