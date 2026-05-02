@@ -98,7 +98,7 @@ public class Blackboard : MonoBehaviour
         if (_lookup.TryGetValue(key, out var entry))
             return (T)entry.GetValue();
 
-        Debug.LogWarning($"Blackboard key '{key}' not found.");
+        //Debug.LogWarning($"Blackboard key '{key}' not found.");
         return default;
     }
 
@@ -121,7 +121,7 @@ public class Blackboard : MonoBehaviour
 
     public void Set<T>(string key, T value)
     {
-        if (_lookup.TryGetValue(key, out var entry))
+        if (_lookup.TryGetValue(key.ToLower(), out var entry))
         {
             entry.SetValue(value);
             return;
@@ -129,7 +129,7 @@ public class Blackboard : MonoBehaviour
 
         var newEntry = new Entry
         {
-            key = key
+            key = key.ToLower()
         };
 
         newEntry.SetValue(value);
