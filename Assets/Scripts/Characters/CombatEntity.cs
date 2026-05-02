@@ -1,0 +1,113 @@
+using GameManagerScripts;
+using System.Collections;
+using UniRx;
+using UnityEditor.Experimental.GraphView;
+using UnityEngine;
+using UnityEngine.Events;
+
+namespace CombatSystem
+{
+    public class CombatEntity : MonoBehaviour
+    {
+
+        public static Subject<CombatEntity> OnSpawned = new();
+        public ReactiveProperty<int> currentHealth;
+        public int maxHealth = 5;
+        public int damage = 1;
+        public Team team;
+        public HitboxHandler hitboxHandler;
+        public HurtboxHandler hurtboxHandler;
+
+        public UnityEvent<CombatEntity> OnTakeHit;
+        public UnityEvent OnDeath;
+
+        private Blackboard _blackboard;
+        #region unity functions
+        private void Awake()
+        {
+            _blackboard = GetComponent<Blackboard>();
+            currentHealth = new ReactiveProperty<int>(5);
+        }
+        private void OnEnable()
+        {
+            if (hitboxHandler != null)
+            {
+                hitboxHandler.onHitTarget.AddListener(OnDamageOther);
+            }
+        }
+        private void OnDisable()
+        {
+            if (hitboxHandler != null)
+            {
+                hitboxHandler.onHitTarget.RemoveListener(OnDamageOther);
+            }
+
+        }
+
+        #endregion
+        public void OnDamageOther(CombatEntity toDamage)
+        {
+            if (toDamage.team == this.team)
+            {
+                return;
+            }
+            CombatData data = new()
+            {
+                source = this,
+                target = toDamage,
+                damage = this.damage
+            };
+            CombatManager.instance.ExecuteAttack(data);
+
+        }
+        public void TakeDamage(int damage, CombatEntity source)
+        {
+            currentHealth.Value -= damage;
+            OnTakeHit.Invoke(source);
+            _blackboard.Set<bool>("hittrigger", true);
+            if (currentHealth.Value <= 0)
+            {
+                Die();
+            }
+        }
+        public void Die()
+        {
+            OnDeath.Invoke();
+        }
+
+        public void Heal(int amount)
+        {
+            currentHealth.Value += amount;
+            if (currentHealth.Value > maxHealth)
+            {
+                currentHealth.Value = maxHealth;
+            }
+        }
+        public void EnableHitbox(int index = -1)
+        {
+            if (hitboxHandler == null)
+                return;
+            hitboxHandler.EnableHitBox(index);
+        }
+        public void DisableHitbox(int index = -1)
+        {
+            if (hitboxHandler == null)
+                return;
+            hitboxHandler.DisableHitBox(index);
+        }
+        public void EnableHurtbox()
+        {
+            if (hurtboxHandler == null)
+                return;
+            //hurtboxHandler.EnableHurtBox();
+        }
+    }
+
+    public enum Team
+    {
+        Enemy,
+        Player,
+        Environment
+
+    }
+}
