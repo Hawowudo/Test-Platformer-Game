@@ -1,0 +1,74 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &655457931176632090
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1212298083061912553}
+  - component: {fileID: 3936831839944208498}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1212298083061912553
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655457931176632090}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.23015, y: 3.55099, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3936831839944208498
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 655457931176632090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: def2f83eedadf83428fdd0aafb16bc23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AudioManager
+  currentVolumeValues:
+    masterVolume: 1
+    sfxVolume: 0.781
+    ambienceVolume: 0.219
+    characterVolume: 0.741
+    monsterVolume: 0.456
+    musicVolume: 0.793
+    jumpscaresVolume: 0.433
+  SFX: {fileID: 11400000, guid: 2de8928f9363f9e4597fa82241ee448a, type: 2}
+  Ambience: {fileID: 11400000, guid: ea00f7e4665b2764d9c2d5d55f03ebe7, type: 2}
+  Characters: {fileID: 11400000, guid: 680aa28d9ab914f4388b134fef999eba, type: 2}
+  Monsters: {fileID: 11400000, guid: 79a082c7b9d867e4ba46f627ecc45fb1, type: 2}
+  Music: {fileID: 11400000, guid: 492c69b287052c2448ecaf9fe9349af2, type: 2}
+  Jumpscares: {fileID: 11400000, guid: bb30c5bc4d217494693a55c59d9c233d, type: 2}
+  soundLibrary: []
+  DebugMode: 0
+  debugSoundName:
+    soundName: BEEP
+    pitch: 1
+    position: {x: 0, y: 0}
+    fadeInDuration: 1
+    fadeOutDuration: 1
+    soundClipAudioSource: {fileID: 0}
+  debugMusicName:
+    soundName: TEST_MUSIC_1
+    fadeInDuration: 3
+    previousSoundFadeOutDuration: 3
+    uniqueTrackID: MUSIC
