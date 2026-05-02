@@ -12,13 +12,17 @@ public class ScreenManager : MonoBehaviour
         GameOver
     }
     public static ScreenManager Instance;
+
     public ScreenType screenType;
     [SerializeField] private GameObject _mainMenuScreen, _pauseScreen, _gameplayScreen, _gameOverScreen;
 
+    public bool debugMode;
+    private ScreenType _previousScreenType;
     #region Unity Functions
     private void Start()
     {
         ShowScreen(screenType);
+        _previousScreenType = screenType;
     }
     private void Awake()
     {
@@ -28,7 +32,17 @@ public class ScreenManager : MonoBehaviour
             return;
         }
         Instance = this;
-        DontDestroyOnLoad(gameObject);
+    }
+    private void Update()
+    {
+        if (!debugMode)
+            return;
+
+        if (screenType != _previousScreenType)
+        {
+            ShowScreen(screenType);
+            _previousScreenType = screenType;
+        }
     }
     #endregion
 
