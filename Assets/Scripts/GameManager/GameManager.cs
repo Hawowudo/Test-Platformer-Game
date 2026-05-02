@@ -1,4 +1,8 @@
+using CombatSystem;
+using InputManagerScripts;
 using System.Collections;
+using System.Linq;
+using UniRx;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 namespace GameManagerScripts
@@ -11,12 +15,12 @@ namespace GameManagerScripts
             return Instance;
         }
 
-        private GameState m_CurrentGameState;
-        private GameState m_PreviousGameState;
-        private bool _isSceneLoading = false;
-        private bool _gameStarted;
 
         public float _menuOpenCloseInputBufferTime = 0.1f;
+        public bool _quickPlay;
+
+        private GameState m_CurrentGameState;
+        private GameObject _playerInstance;
         private float _menuOpenCloseInputBufferCooldown = 0f;
 
         #region Unity Functions
@@ -32,11 +36,21 @@ namespace GameManagerScripts
         }
         private void Start()
         {
-            SwitchGameState(GameState.UI);
+            SwitchGameState(GameState.MainMenu);
+            if (_quickPlay)
+            {
+                StartGame();
+            }
         }
         private void Update()
         {
             _menuOpenCloseInputBufferCooldown += Time.unscaledDeltaTime;
+
+            if (PlayerInputManager.Instance.MenuOpenClosePressed() && _menuOpenCloseInputBufferCooldown > _menuOpenCloseInputBufferTime)
+            {
+                _menuOpenCloseInputBufferCooldown = 0f;
+                TogglePauseScreen();
+            }
         }
         #endregion
 
@@ -46,28 +60,36 @@ namespace GameManagerScripts
             {
                 return;
             }
-            m_PreviousGameState = m_CurrentGameState != GameState.UI ? m_CurrentGameState : GameState.Playing;
             m_CurrentGameState = state;
             switch (m_CurrentGameState)
             {
-                case GameState.UI:
-                    PauseGame();
-                    break;
                 case GameState.Playing:
                     ResumeGame();
+                    PlayerInputManager.Instance.ActivateActionMap(InputActionMapType.Gameplay);
+                    ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.Gameplay);
+                    break;
+                case GameState.GameOver:
+                    PauseGame();
+                    PlayerInputManager.Instance.ActivateActionMap(InputActionMapType.UI);
+                    ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.GameOver);
+                    break;
+                case GameState.MainMenu:
+                    PauseGame();
+                    PlayerInputManager.Instance.ActivateActionMap(InputActionMapType.UI);
+                    ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.MainMenu);
+                    break;
+                case GameState.PauseScreen:
+                    PauseGame();
+                    PlayerInputManager.Instance.ActivateActionMap(InputActionMapType.UI);
+                    ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.PauseScreen);
                     break;
             }
         }
         #region Saves
         public void LoadNewScene(string sceneName)
         {
-            if (_isSceneLoading)
-            {
-                Debug.LogWarning("Scene is already loading, cannot load new scene.");
-                return;
-            }
-            _isSceneLoading = true;
-            StartCoroutine(LoadScene(sceneName));
+            //StartCoroutine(LoadScene(sceneName));
+            SceneManager.LoadScene(sceneName);
         }
         IEnumerator LoadScene(string sceneName)
         {
@@ -99,6 +121,19 @@ namespace GameManagerScripts
             }
         }
         #endregion
+
+        #region Pause
+        public void TogglePauseScreen()
+        {
+            if (m_CurrentGameState == GameState.PauseScreen)
+            {
+                SwitchGameState(GameState.Playing);
+            }
+            else if (m_CurrentGameState == GameState.Playing)
+            {
+                SwitchGameState(GameState.PauseScreen);
+            }
+        }
         public void PauseGame()
         {
             Time.timeScale = 0f;
@@ -117,18 +152,56 @@ namespace GameManagerScripts
         {
             PauseGame();
             yield return new WaitForSecondsRealtime(duration);
-            if (m_CurrentGameState != GameState.UI)
+            if (m_CurrentGameState != GameState.PauseScreen)
             {
                 ResumeGame();
             }
         }
+        #endregion
 
+        public void StartGame()
+        {
+            if(_playerInstance != null)
+            Destroy(_playerInstance);
+
+            StartPlayerSetup();
+            ResumeGame();
+            LoadNewScene("FOREST_CHUNK_1");
+            SwitchGameState(GameState.Playing);
+            ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.Gameplay);
+        }
+        public void OnPlayerFound()
+        {
+            _playerInstance.GetComponent<CombatEntity>().currentHealth
+            .Subscribe(hp => { if (hp <= 0) OnGameOver(); })
+            .AddTo(this);
+        }
+        public void StartPlayerSetup()
+        {
+            Observable.EveryUpdate()
+                .Select(_ => FindObjectsOfType<CombatEntity>()
+                    .FirstOrDefault(x => x.team == Team.Player))
+                .Where(x => x != null)
+                .Take(1)
+                .Subscribe(entity =>
+                {
+                    _playerInstance = entity.gameObject;
+                    OnPlayerFound();
+                })
+                .AddTo(this);
+        }
+        public void OnGameOver()
+        {
+            SwitchGameState(GameState.GameOver);
+        }
     }
     [System.Serializable]
     public enum GameState
     {
-        UI=1,
         Playing=2,
+        GameOver = 3,
+        MainMenu = 4,
+        PauseScreen = 5
     }
 
 
