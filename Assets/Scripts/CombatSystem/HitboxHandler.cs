@@ -1,9 +1,6 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Experimental.Playables;
-using static UnityEngine.UI.GridLayoutGroup;
 
 
 namespace CombatSystem
@@ -15,20 +12,32 @@ namespace CombatSystem
         public GameObject[] hitBoxGroups;
         public UnityEvent<CombatEntity> onHitTarget;
         public float hitCooldown = 0.5f;
-        private List<CombatEntity> _currentHits = new List<CombatEntity>();
-
-        private bool _checkingHitboxes;
+        private HashSet<CombatEntity> _currentHits = new HashSet<CombatEntity>();
+        private bool _isCheckingHitboxes;
         public void EnableHitBox(int groupIndex)
         {
-            Debug.Log($"Enabling hitbox group {groupIndex}");
+            if (_isCheckingHitboxes)
+            {
+                Debug.Log("Blocked recursive EnableHitBox.");
+                return;
+            }
+
+            Debug.Log($"{name} EnableHitbox called. Frame: {Time.frameCount}");
+            Debug.Log(System.Environment.StackTrace);
+
             if (groupIndex < 0 || groupIndex >= hitBoxGroups.Length)
             {
                 return;
             }
+            _isCheckingHitboxes = true;
+
             DisableAllHitbox();
             hitBoxGroups[groupIndex].SetActive(true);
-            _checkingHitboxes = true;
+            CheckActiveHitboxes();
+
+            _isCheckingHitboxes = false;
         }
+
         public void DisableHitBox(int groupIndex)
         {
             if (groupIndex < 0 || groupIndex >= hitBoxGroups.Length)
@@ -51,17 +60,12 @@ namespace CombatSystem
             {
                 hitbox.SetActive(false);
             }
-            _checkingHitboxes = false;
             _currentHits.Clear();
-            StopAllCoroutines();
-        }
-        private void Update() 
-        {
-            if(_checkingHitboxes)
-                CheckActiveHitboxes();
         }
         private void CheckActiveHitboxes()
         {
+            Debug.Log("CheckActiveHitboxes CALLED");
+            CombatEntity self = GetComponentInParent<CombatEntity>();
             foreach (GameObject hitbox in hitBoxGroups)
             {
                 if (!hitbox.activeInHierarchy)
@@ -80,6 +84,8 @@ namespace CombatSystem
 
                 foreach (Collider2D hit in hits)
                 {
+                    if (hit.transform.IsChildOf(self.transform))
+                        continue;
                     HitCheck(hit);
                 }
             }
@@ -105,24 +111,13 @@ namespace CombatSystem
                     return;
                 }
 
-                AddToListOfHits(hurtboxHandler.GetCombatEntity());
+                if (!_currentHits.Contains(hurtboxHandler.GetCombatEntity()))
+                {
+                    _currentHits.Add(hurtboxHandler.GetCombatEntity());
+                    onHitTarget?.Invoke(hurtboxHandler.GetCombatEntity());
+                }
             }
         }
-        private void AddToListOfHits(CombatEntity newHit)
-        {
-            if (!_currentHits.Contains(newHit))
-            {
-                _currentHits.Add(newHit);
-                onHitTarget.Invoke(newHit);
-                StartCoroutine(RemoveFromHitList(newHit, hitCooldown));
-            }
-        }
-        IEnumerator RemoveFromHitList(CombatEntity entity, float hitCooldown)
-        {
-            yield return new WaitForSeconds(hitCooldown);
-            _currentHits.Remove(entity);
-        }
-
         private void DrawDebugBox(
             Vector2 origin,
             Vector2 size)

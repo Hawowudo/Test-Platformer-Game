@@ -60,19 +60,22 @@ namespace CombatSystem
             {
                 source = this,
                 target = toDamage,
-                damage = this.damage
+                damage = this.damage,
+                isFatal = toDamage.currentHealth.Value - this.damage <= 0
             };
             CombatManager.instance.ExecuteAttack(data);
 
         }
         public void TakeDamage(int damage, CombatEntity source)
         {
+            Debug.Log($"Took damage from {source.name}");
             currentHealth.Value -= damage;
-            OnTakeHit.Invoke(source);
+            //OnTakeHit.Invoke(source);
             _blackboard.Set<bool>("hittrigger", true);
             if (currentHealth.Value <= 0)
             {
                 Die();
+                _blackboard.Set<bool>("isdead", true);
             }
         }
         public void Die()

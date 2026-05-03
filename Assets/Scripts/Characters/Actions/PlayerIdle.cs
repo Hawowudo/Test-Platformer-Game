@@ -19,7 +19,7 @@ public class PlayerIdle : ActionStateLogic
         base.FrameUpdate(actionHandler);
         if (actionHandler._blackboard.Get<bool>("attackpressed"))
         {
-            actionHandler.ChangeState(actionHandler.GetState< PlayerAttack>());
+            actionHandler.ChangeState(actionHandler.GetState<PlayerAttack>());
             return;
         }
 
@@ -40,9 +40,10 @@ public class PlayerIdle : ActionStateLogic
             actionHandler.ChangeState(actionHandler.GetState<PlayerJump>());
             return;
         }
-        if (actionHandler._rigidBody2D.velocity.y < -1f && !GroundCheck(actionHandler))
+        if (actionHandler._rigidBody2D.velocity.y < -1f)
         {
-            actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
+            if (!GroundCheck(actionHandler))
+                actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
         }
 
     }

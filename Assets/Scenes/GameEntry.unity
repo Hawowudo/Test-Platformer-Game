@@ -131,21 +131,13 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2566099163095803073, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
+      propertyPath: hitStopDuration
+      value: 0.2
+      objectReference: {fileID: 0}
     - target: {fileID: 2613534862701893489, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
       propertyPath: m_Name
       value: GameManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 5089153668260769369, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7528173584664409783, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7528173584664409783, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8231866227038705296, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
       propertyPath: m_LocalPosition.x

@@ -33,9 +33,14 @@ public class PlayerFall : ActionStateLogic
             return;
         }
         CalculateMovement(actionHandler);
-        if (GroundCheck(actionHandler))
+        if (Time.frameCount % 30 == 0)
         {
-            
+            if (!GroundCheck(actionHandler))
+            {
+                return;
+            }
+
+
 
             bool isMoving = Mathf.Abs(actionHandler._blackboard.Get<Vector2>("moveinput").x) > 0.1f;
 

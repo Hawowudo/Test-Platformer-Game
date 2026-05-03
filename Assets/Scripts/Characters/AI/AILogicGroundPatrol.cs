@@ -33,7 +33,7 @@ public class AILogicGroundPatrol : AILogic
         GetBlackboard(logicHandler).Set<int>("facedirection", -1);
         GetBlackboard(logicHandler).Set<float>("movespeed", AIMoveSpeed);
         GetBlackboard(logicHandler).Set<bool>("playerdetected", false);
-        logicHandler.StartCoroutine(PatrolState(logicHandler));
+        StartPatrol(logicHandler);
     }
     public override void FrameUpdate(CharacterLogicHandler logicHandler)
     {
@@ -42,9 +42,18 @@ public class AILogicGroundPatrol : AILogic
             FindTarget(logicHandler);
             return;
         }
-        if( PlayerForwardDetection(logicHandler) && PlayerSightCheck(logicHandler) && PlayerHeightCheck(logicHandler) && PlayerDistanceCheck(logicHandler) && GetBlackboard(logicHandler).Get<string>("currentstate") == "patrol")
+        if (Time.frameCount % 30 != 0)
+            return;
+        
+        if( PlayerForwardDetection(logicHandler) && PlayerSightCheck(logicHandler) && PlayerHeightCheck(logicHandler) && PlayerDistanceCheck(logicHandler) && GetBlackboard(logicHandler).Get<string>("currentstate") == "patrol" )
         {
             GetBlackboard(logicHandler).Set<bool>("playerdetected", true);
+            StartChase(logicHandler);
+        }
+        if (GetBlackboard(logicHandler).Get<bool>("hittrigger") && GetBlackboard(logicHandler).Get<string>("currentstate") == "patrol")
+        {
+            GetBlackboard(logicHandler).Set<bool>("playerdetected", true);
+            StartChase(logicHandler);
         }
     }
     public override Blackboard GetBlackboard(CharacterLogicHandler logicHandler)
@@ -54,24 +63,25 @@ public class AILogicGroundPatrol : AILogic
     IEnumerator PatrolState(CharacterLogicHandler logicHandler)
     {
         GetBlackboard(logicHandler).Set<string>("currentstate", "patrol");
-        
-        while (!GetBlackboard(logicHandler).Get<bool>("playerdetected"))
+        MoveForward(logicHandler);
+        while (true)
         {
             if (!GroundCheck(logicHandler))
             {
                 yield return null;
                 continue;
             }
-            MoveForward(logicHandler);
             
             if ((!GroundAheadCheck(logicHandler) || WallCheck(logicHandler))
                 && Time.frameCount % FrameCountToCheckForGround == 0)
             {
+                GetBlackboard(logicHandler).Set<Vector2>("previousmoveinput", GetBlackboard(logicHandler).Get<Vector2>("moveinput") );
+                GetBlackboard(logicHandler).Set<Vector2>("moveinput", Vector2.zero);
                 yield return TurnAround(logicHandler);
+                MoveForward(logicHandler);
             }
             yield return null;
         }
-        yield return ChaseState(logicHandler);
     }
     bool CheckXDistance(CharacterLogicHandler logicHandler)
     {
@@ -87,6 +97,7 @@ public class AILogicGroundPatrol : AILogic
         GetBlackboard(logicHandler).Set<string>("currentstate", "chase");
         while (PlayerSightCheck(logicHandler) && PlayerHeightCheck(logicHandler) && PlayerDistanceCheck(logicHandler))
         {
+            MoveTowardsTarget(logicHandler);
             while (CheckXDistance(logicHandler))
             {
                 GetBlackboard(logicHandler).Set<Vector2>("moveinput", Vector2.zero);
@@ -94,11 +105,9 @@ public class AILogicGroundPatrol : AILogic
                 yield return new WaitForSeconds(attackPause);
                 yield return Attack(logicHandler);
             }
-            MoveTowardsTarget(logicHandler);
             yield return null;
         }
-        GetBlackboard(logicHandler).Set<Vector2>("moveinput", Vector2.zero);
-        yield return PatrolState(logicHandler);
+        StartPatrol(logicHandler);
     }
     IEnumerator Attack(CharacterLogicHandler logicHandler)
     {
@@ -107,7 +116,6 @@ public class AILogicGroundPatrol : AILogic
     }
     IEnumerator TurnAround(CharacterLogicHandler logicHandler)
     {
-        GetBlackboard(logicHandler).Set<Vector2>("moveinput", Vector2.zero);
         yield return new WaitForSeconds(turnPauseDuration);
         GetBlackboard(logicHandler).Set<int>("facedirection", -GetBlackboard(logicHandler).Get<int>("facedirection"));
     }
@@ -121,6 +129,16 @@ public class AILogicGroundPatrol : AILogic
         GetBlackboard(logicHandler).Set<Vector2>("moveinput", new Vector2(directionToTarget.x, 0));
         GetBlackboard(logicHandler).Set<int>("facedirection", directionToTarget.x > 0 ? 1 : -1);
 
+    }
+    public void StartPatrol(CharacterLogicHandler logicHandler)
+    {
+        logicHandler.StopAllCoroutines();
+        logicHandler.StartCoroutine(PatrolState(logicHandler));
+    }
+    public void StartChase(CharacterLogicHandler logicHandler)
+    {
+        logicHandler.StopAllCoroutines();
+        logicHandler.StartCoroutine(ChaseState(logicHandler));
     }
     public void MoveForward(CharacterLogicHandler logicHandler)
     {

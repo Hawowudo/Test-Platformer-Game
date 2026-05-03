@@ -46,7 +46,7 @@ namespace CombatSystem
                 targetEntity.TakeDamage(data.damage, data.source);
                 SpriteFlash(data);
                 Knockback(data);
-                HitStop();
+                HitStop(data);
                 CameraShake(data);
             }
         }
@@ -60,23 +60,24 @@ namespace CombatSystem
         IEnumerator SpriteAttackFlashRoutine(SpriteRenderer renderer)
         {
             renderer.material = attackFlashMaterial;
+            renderer.material.SetFloat("_FlashAmount", 1f);
             yield return new WaitForSecondsRealtime(0.1f);
-            renderer.material = defaultMaterial;
+            renderer.material.SetFloat("_FlashAmount", 0f);
             yield return new WaitForSecondsRealtime(0.1f);
-            renderer.material = attackFlashMaterial;
+            renderer.material.SetFloat("_FlashAmount", 1f);
             yield return new WaitForSecondsRealtime(0.1f);
             renderer.material = defaultMaterial;
         }
 
         public void SpriteFlash(CombatData data)
         {
-            SpriteRenderer renderer = data.target.GetComponent<SpriteRenderer>();
-            StartCoroutine(SpriteFlashRoutine(renderer));
+            StartCoroutine(SpriteFlashRoutine(data));
         }
-        IEnumerator SpriteFlashRoutine(SpriteRenderer renderer)
+        IEnumerator SpriteFlashRoutine(CombatData data)
         {
+            SpriteRenderer renderer = data.target.GetComponent<SpriteRenderer>();
             renderer.material = flashMaterial;
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return new WaitForSecondsRealtime( data.isFatal ? 0.3f : 0.1f );
             renderer.material = defaultMaterial;
         }
 
@@ -91,9 +92,9 @@ namespace CombatSystem
                 rb.velocity = new Vector2((knockbackDirection * knockbackForce).x, 0);
             }
         }
-        public void HitStop()
+        public void HitStop(CombatData data)
         {
-            GameManager.Get().PauseGameDuration(hitStopDuration);
+            GameManager.Get().PauseGameDuration(data.isFatal ? hitStopDuration * 2 : hitStopDuration);
         }
 
         public void CameraShake(CombatData data)
@@ -104,15 +105,14 @@ namespace CombatSystem
             }
             if (mainCamera != null)
             {
-                
-                StartCoroutine(ShakeCamera(data.isFatal? cameraShakeForceFatal * 3 : cameraShakeForce));
+                StartCoroutine(ShakeCamera(data.isFatal ? cameraShakeForceFatal * 3 : cameraShakeForce, data.isFatal ? cameraShakeDuration * 3 : cameraShakeDuration ));
             }
         }
-        IEnumerator ShakeCamera(float shakeForce)
+        IEnumerator ShakeCamera(float shakeForce, float duration)
         {
             CinemachineBasicMultiChannelPerlin noise = mainCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
             noise.m_AmplitudeGain = shakeForce;
-            yield return new WaitForSecondsRealtime(cameraShakeDuration);
+            yield return new WaitForSecondsRealtime(duration);
             noise.m_AmplitudeGain = 0f;
         }
         #endregion

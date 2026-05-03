@@ -32,9 +32,10 @@ public class PlayerRun : ActionStateLogic
             actionHandler.ChangeState(actionHandler.GetState<PlayerJump>());
             return;
         }
-        if (actionHandler._rigidBody2D.velocity.y < -0.5f && !GroundCheck(actionHandler))
+        if (actionHandler._rigidBody2D.velocity.y < -1f)
         {
-            actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
+            if (!GroundCheck(actionHandler))
+                actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
         }
 
     }

@@ -10,8 +10,8 @@ namespace AILogicGroup
             origin = origin + offset;
             Vector2 rayDir =Vector2.right * direction;
             RaycastHit2D hit =   Physics2D.Raycast(origin, rayDir,distance,wallMask);
-            if (Time.frameCount % 12 == 0)
-                Debug.DrawRay( origin, rayDir * distance, Color.red, 0.05f);
+            //if (Time.frameCount % 12 == 0)
+            //    Debug.DrawRay( origin, rayDir * distance, Color.red, 0.05f);
             return hit.collider != null;
         }
         public static bool GroundAheadCheck(Vector2 origin, Vector2 offset, int direction,float raydistance, float distanceFromBody, LayerMask groundMask)
@@ -20,11 +20,11 @@ namespace AILogicGroup
             Vector2 rayDir = (Vector2.down) .normalized;
             Vector2 rayPos = new Vector2(origin.x + (direction * distanceFromBody), origin.y);
             RaycastHit2D hit = Physics2D.Raycast(rayPos, rayDir, raydistance, groundMask);
-            if (Time.frameCount % 12 == 0)
-            {
-                Debug.DrawRay(rayPos, rayDir * raydistance, Color.blue, 0.1f);
-                Debug.DrawRay(origin, (rayPos - origin ).normalized * distanceFromBody, Color.blue, 0.05f);
-            }
+            //if (Time.frameCount % 12 == 0)
+            //{
+            //    Debug.DrawRay(rayPos, rayDir * raydistance, Color.blue, 0.1f);
+            //    Debug.DrawRay(origin, (rayPos - origin ).normalized * distanceFromBody, Color.blue, 0.05f);
+            //}
             return hit.collider != null;
         }
         public static bool GroundCheck(Vector2 origin, Vector2 offset, Vector2 boxSize, LayerMask groundMask)
@@ -32,12 +32,12 @@ namespace AILogicGroup
             origin = origin + offset;
             Collider2D hit = Physics2D.OverlapBox(origin, boxSize, 0f, groundMask);
 
-            if(Time.frameCount % 12 == 0)
-            {
-                Debug.DrawRay(origin, Vector2.down * boxSize.y / 2, Color.green, 0.1f);
-                Debug.DrawRay(origin, Vector2.right * boxSize.x / 2, Color.green, 0.1f);
-                Debug.DrawRay(origin, Vector2.left * boxSize.x / 2, Color.green, 0.1f);
-            }
+            //if(Time.frameCount % 12 == 0)
+            //{
+            //    Debug.DrawRay(origin, Vector2.down * boxSize.y / 2, Color.green, 0.1f);
+            //    Debug.DrawRay(origin, Vector2.right * boxSize.x / 2, Color.green, 0.1f);
+            //    Debug.DrawRay(origin, Vector2.left * boxSize.x / 2, Color.green, 0.1f);
+            //}
             return hit != null;
         }
         public static Collider2D BoxCheck(Vector2 origion, Vector2 size, LayerMask detectionMask)
@@ -84,6 +84,7 @@ namespace AILogicGroup
         }
         private static void DrawBox( Vector2 center, Vector2 size, Vector2 direction)
         {
+            return;
             Vector2 right =
                 direction;
 
