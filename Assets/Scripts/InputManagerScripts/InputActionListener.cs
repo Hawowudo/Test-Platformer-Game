@@ -44,7 +44,6 @@ namespace InputManagerScripts
         }
         public void OnMove(Vector2 vector)
         {
-            Debug.Log($"Move: {vector}");
             OnMovePerform?.Invoke(vector);
             if(_blackboard?.Get<Vector2>("moveinput") != Vector2.zero )
                 _blackboard?.Set("previousmoveinput", _blackboard?.Get<Vector2>("moveinput") );

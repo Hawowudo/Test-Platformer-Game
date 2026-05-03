@@ -9,7 +9,8 @@ public class ScreenManager : MonoBehaviour
         MainMenu,
         PauseScreen,
         Gameplay,
-        GameOver
+        GameOver,
+        none
     }
     public static ScreenManager Instance;
 

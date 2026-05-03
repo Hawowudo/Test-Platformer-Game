@@ -12,7 +12,6 @@ namespace CombatSystem
         public HitboxHandler hitboxHandler;
         public HurtboxHandler hurtboxHandler;
 
-        public static Subject<CombatEntity> OnSpawned = new();
         public ReactiveProperty<int> currentHealth;
         public ReactiveProperty<int> maxHealth;
 
@@ -27,11 +26,10 @@ namespace CombatSystem
         private void Awake()
         {
             _blackboard = GetComponent<Blackboard>();
-            currentHealth = new ReactiveProperty<int>(5);
-            maxHealth = new ReactiveProperty<int>(5);
         }
         private void OnEnable()
         {
+            ResetValues();
             if (hitboxHandler != null)
             {
                 hitboxHandler.onHitTarget.AddListener(OnDamageOther);
@@ -47,6 +45,11 @@ namespace CombatSystem
         }
 
         #endregion
+        private void ResetValues()
+        {
+            currentHealth = new ReactiveProperty<int>(5);
+            maxHealth = new ReactiveProperty<int>(5);
+        }
         public void OnDamageOther(CombatEntity toDamage)
         {
             if (toDamage.team == this.team)

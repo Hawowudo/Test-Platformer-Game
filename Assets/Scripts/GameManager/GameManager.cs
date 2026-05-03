@@ -15,7 +15,7 @@ namespace GameManagerScripts
             return Instance;
         }
 
-
+        public GameObject playerPrefab;
         public float _menuOpenCloseInputBufferTime = 0.1f;
         public bool _quickPlay;
 
@@ -53,7 +53,30 @@ namespace GameManagerScripts
             }
         }
         #endregion
+        public void CheckForPlayerSpawner()
+        {
+            PlayerSpawner.OnPlayerSpawned
+                .Take(1)
+                .Subscribe(spawner =>
+                {
+                    spawner.SpawnPlayer();
+                    spawner.LinkCinemachineCamera();
 
+                    Cinemachine.CinemachineVirtualCamera virtualCamera = FindObjectOfType<Cinemachine.CinemachineVirtualCamera>();
+                    virtualCamera.GetComponentInChildren<CameraFadeHandler>().StartFadeOut(() =>
+                    {
+                        SwitchGameState(GameState.Playing);
+
+                        _playerInstance.GetComponent<CombatEntity>().currentHealth
+                        .Subscribe(hp => {
+                            if (FindAnyObjectByType<HealthBarScript>() == null) 
+                                return;
+                            FindAnyObjectByType<HealthBarScript>().UpdateHealthBar(hp, _playerInstance.GetComponent<CombatEntity>().maxHealth.Value); })
+                        .AddTo(this);
+                    });
+                })
+                .AddTo(this);
+        }
         public void SwitchGameState(GameState state)
         {
             if(m_CurrentGameState == state)
@@ -160,6 +183,10 @@ namespace GameManagerScripts
         }
         #endregion
 
+        public GameObject GetPlayer()
+        {
+            return _playerInstance;
+        }
         public void StartGame()
         {
             if(_playerInstance != null)
@@ -167,9 +194,10 @@ namespace GameManagerScripts
 
             StartPlayerSetup();
             ResumeGame();
+
+            CheckForPlayerSpawner();
             LoadNewScene("FOREST_CHUNK_1");
-            SwitchGameState(GameState.Playing);
-            ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.Gameplay);
+            ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.none);
         }
         public void OnPlayerFound()
         {
