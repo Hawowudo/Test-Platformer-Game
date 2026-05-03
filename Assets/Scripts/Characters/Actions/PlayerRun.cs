@@ -32,7 +32,7 @@ public class PlayerRun : ActionStateLogic
             actionHandler.ChangeState(actionHandler.GetState<PlayerJump>());
             return;
         }
-        if (actionHandler._rigidBody2D.velocity.y < -0.5f)
+        if (actionHandler._rigidBody2D.velocity.y < -0.5f && !GroundCheck(actionHandler))
         {
             actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
         }
@@ -54,5 +54,14 @@ public class PlayerRun : ActionStateLogic
         float moveSpeed = actionHandler._blackboard.Get<float>("movespeed");
         actionHandler.GetComponent<SpriteRenderer>().flipX = actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")) < 0;
         actionHandler._rigidBody2D.velocity = new Vector2((moveinput.x == 0 ? 0 : (moveinput.x > 0 ? 1 : -1)) * moveSpeed, actionHandler._rigidBody2D.velocity.y);
+    }
+    public bool GroundCheck(CharacterActionHandler actionHandler)
+    {
+        Vector2 position = actionHandler.transform.position;
+        Vector2 size = actionHandler.GetComponent<CapsuleCollider2D>().size;
+        Vector2 offset = actionHandler.GetComponent<CapsuleCollider2D>().offset;
+        LayerMask layerMask = LayerMask.GetMask("Default");
+        RaycastHit2D hit = Physics2D.BoxCast(position + offset, size, 0f, Vector2.down, 0.2f, layerMask);
+        return hit.collider != null;
     }
 }
