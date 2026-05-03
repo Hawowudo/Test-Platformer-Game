@@ -16,3 +16,4 @@ MonoBehaviour:
   _animationClip2: {fileID: 7400000, guid: f3b5a3736b4ec784cab94b35e61a5e82, type: 2}
   attackqueuedelay: 0.2
   attackComboDelay: 0.5
+  attackComboBaseCooldown: 2

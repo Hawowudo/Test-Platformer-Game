@@ -14,19 +14,13 @@ public class PlayerJump : ActionStateLogic
     {
         base.OnEnterState(actionHandler);
 
-        actionHandler.GetComponent<Animator>()
-            .Play(_animationClip.name);
+        actionHandler.GetComponent<Animator>().Play(_animationClip.name);
 
         var rb = actionHandler._rigidBody2D;
 
-        actionHandler._blackboard.Set(
-            "originalGravity",
-            rb.gravityScale);
+        actionHandler._blackboard.Set("originalGravity",rb.gravityScale);
 
-        // Apply jump once
-        rb.velocity = new Vector2(
-            rb.velocity.x,
-            jumpForce);
+        rb.velocity = new Vector2( rb.velocity.x,jumpForce);
 
         rb.gravityScale = normalGravity;
     }
@@ -43,19 +37,20 @@ public class PlayerJump : ActionStateLogic
             return;
         }
 
-        // Hit ceiling
         if (CeilingCheck(actionHandler))
         {
-            actionHandler.ChangeState(
-                actionHandler.GetState<PlayerFall>());
+            actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
             return;
         }
 
-        // Apex reached
         if (actionHandler._rigidBody2D.velocity.y <= 0f)
         {
-            actionHandler.ChangeState(
-                actionHandler.GetState<PlayerFall>());
+            actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
+        }
+
+        if (!actionHandler._blackboard.Get<bool>("jumppressed"))
+        {
+            actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
         }
     }
 
@@ -67,15 +62,11 @@ public class PlayerJump : ActionStateLogic
 
         var rb = actionHandler._rigidBody2D;
 
-        bool jumpHeld =
-            actionHandler._blackboard.Get<bool>("jumppressed");
+        bool jumpHeld = actionHandler._blackboard.Get<bool>("jumppressed");
 
-        // Released jump early = short hop
         if (!jumpHeld && rb.velocity.y > 0f)
         {
-            rb.gravityScale =
-                normalGravity *
-                earlyReleaseGravityMultiplier;
+            rb.gravityScale = normalGravity *  earlyReleaseGravityMultiplier;
         }
         else
         {
@@ -90,9 +81,7 @@ public class PlayerJump : ActionStateLogic
     {
         base.OnExitState(actionHandler);
 
-        actionHandler._rigidBody2D.gravityScale =
-            actionHandler._blackboard.Get<float>(
-                "originalGravity");
+        actionHandler._rigidBody2D.gravityScale = actionHandler._blackboard.Get<float>("originalGravity");
 
         actionHandler._blackboard.Set<bool>("jumppressed", false);
     }

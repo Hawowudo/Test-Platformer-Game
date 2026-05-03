@@ -131,21 +131,9 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2566099163095803073, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
-      propertyPath: knockbackForce
-      value: 10
-      objectReference: {fileID: 0}
     - target: {fileID: 2613534862701893489, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
       propertyPath: m_Name
       value: GameManager
-      objectReference: {fileID: 0}
-    - target: {fileID: 5964603670080836209, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
-      propertyPath: _quickPlay
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7013557332235812895, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
-      propertyPath: debugMode
-      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8231866227038705296, guid: bc74ce98e164ccc478a8bfc4b74fd0bb, type: 3}
       propertyPath: m_LocalPosition.x

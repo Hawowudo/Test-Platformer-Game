@@ -6,11 +6,9 @@ using UnityEngine.InputSystem.LowLevel;
 [RequireComponent(typeof(Rigidbody2D))]
 public class CharacterActionHandler : MonoBehaviour
 {
-    /// <summary>
-    /// This script handles the action states of the character
-    /// </summary>
     public Rigidbody2D _rigidBody2D;
     public Blackboard _blackboard;
+    public BlackboardTimer _blackboardTimer;
 
     public ActionStateLogic[] _switchableStates;
     [SerializeReference] public ActionStateLogic _currentState;
@@ -18,13 +16,14 @@ public class CharacterActionHandler : MonoBehaviour
 
     public bool debugMode;
     public TextMeshProUGUI debugText;
+    int _actionSign = 0;
 
     #region Unity Functions
     void Start()
     {
         _blackboard = GetComponent<Blackboard>();
         _rigidBody2D = GetComponent<Rigidbody2D>();
-
+        _blackboardTimer = GetComponent<BlackboardTimer>();
         _currentState = _initialState;
         _currentState.OnEnterState(this);
 
@@ -46,7 +45,7 @@ public class CharacterActionHandler : MonoBehaviour
     {
         if (newState == null || newState == _currentState)
             return;
-        Debug.Log($"Changing state from {_currentState.GetType().Name} to {newState.GetType().Name}");
+        //Debug.Log($"Changing state from {_currentState.GetType().Name} to {newState.GetType().Name}");
         if(debugMode)
             debugText.text = newState.GetType().Name;
         _currentState.OnExitState(this);
@@ -65,7 +64,6 @@ public class CharacterActionHandler : MonoBehaviour
         Debug.LogWarning($"State {typeof(T).Name} not found.");
         return null;
     }
-
     public int GetSignDirection(Vector2 origin, Vector2 targetPos)
     {
         Vector2 direction = targetPos - origin;
@@ -73,7 +71,12 @@ public class CharacterActionHandler : MonoBehaviour
     }
     public int GetSign(Vector2 direction)
     {
-        return direction.x >= 0 ? 1 : -1;
+        _actionSign = direction.x >= 0 ? 1 : -1;
+        return _actionSign;
+    }
 
+    public int GetSign()
+    {
+        return _actionSign;
     }
 }

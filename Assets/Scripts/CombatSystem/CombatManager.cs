@@ -11,6 +11,7 @@ namespace CombatSystem
         public static CombatManager instance;
         public Material flashMaterial;
         public Material defaultMaterial;
+        public Material attackFlashMaterial;
         public float knockbackForce = 10f;
         public float hitStopDuration = 0.2f;
         public float cameraShakeForce = 0.2f;
@@ -52,6 +53,21 @@ namespace CombatSystem
         #endregion
 
         #region CombatSystem Juicing
+        public void AttackFlash(SpriteRenderer renderer)
+        {
+            StartCoroutine(SpriteAttackFlashRoutine(renderer));
+        }
+        IEnumerator SpriteAttackFlashRoutine(SpriteRenderer renderer)
+        {
+            renderer.material = attackFlashMaterial;
+            yield return new WaitForSecondsRealtime(0.1f);
+            renderer.material = defaultMaterial;
+            yield return new WaitForSecondsRealtime(0.1f);
+            renderer.material = attackFlashMaterial;
+            yield return new WaitForSecondsRealtime(0.1f);
+            renderer.material = defaultMaterial;
+        }
+
         public void SpriteFlash(CombatData data)
         {
             SpriteRenderer renderer = data.target.GetComponent<SpriteRenderer>();
@@ -77,7 +93,7 @@ namespace CombatSystem
         }
         public void HitStop()
         {
-            GameManager.Get().PauseGameDuration(0.2f);
+            GameManager.Get().PauseGameDuration(hitStopDuration);
         }
 
         public void CameraShake(CombatData data)

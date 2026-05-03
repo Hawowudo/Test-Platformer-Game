@@ -645,6 +645,7 @@ GameObject:
   - component: {fileID: -3507104823524199502}
   - component: {fileID: 6429145340283620137}
   - component: {fileID: 4921695397803680816}
+  - component: {fileID: 7254742982730600192}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -710,7 +711,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 5
   m_Sprite: {fileID: -365253023, guid: 54ce019126a93fd4ea4ac6db88924960, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -852,6 +853,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigidBody2D: {fileID: 1713867267548264490}
   _blackboard: {fileID: 2578658140282355664}
+  _blackboardTimer: {fileID: 0}
   _switchableStates:
   - {fileID: 11400000, guid: 7dc3cad42d1f94f47bc3746643f05147, type: 2}
   - {fileID: 11400000, guid: 66897a9537d65af4c95f379ca37c1440, type: 2}
@@ -876,13 +878,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 862488e862af48b48b6b0696046eea73, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  currentHealth:
-    value: 5
-  maxHealth: 5
-  damage: 1
-  team: 1
   hitboxHandler: {fileID: 2015105484872782075}
   hurtboxHandler: {fileID: 3910140155784568429}
+  currentHealth:
+    value: 5
+  maxHealth:
+    value: 0
+  damage: 1
+  team: 1
   OnTakeHit:
     m_PersistentCalls:
       m_Calls: []
@@ -901,6 +904,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d64211dfce815f6418a1eb3ebb4633b4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  controlType: 1
+  blackboard: {fileID: 0}
+  aiLogic: {fileID: 0}
 --- !u!114 &4921695397803680816
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -929,3 +935,15 @@ MonoBehaviour:
   OnJumpCancel:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &7254742982730600192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9121831448378335390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e053a553c6ff2bf428122ccd95da0bcd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

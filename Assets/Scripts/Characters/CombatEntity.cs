@@ -9,14 +9,15 @@ namespace CombatSystem
 {
     public class CombatEntity : MonoBehaviour
     {
+        public HitboxHandler hitboxHandler;
+        public HurtboxHandler hurtboxHandler;
 
         public static Subject<CombatEntity> OnSpawned = new();
         public ReactiveProperty<int> currentHealth;
-        public int maxHealth = 5;
+        public ReactiveProperty<int> maxHealth;
+
         public int damage = 1;
         public Team team;
-        public HitboxHandler hitboxHandler;
-        public HurtboxHandler hurtboxHandler;
 
         public UnityEvent<CombatEntity> OnTakeHit;
         public UnityEvent OnDeath;
@@ -27,6 +28,7 @@ namespace CombatSystem
         {
             _blackboard = GetComponent<Blackboard>();
             currentHealth = new ReactiveProperty<int>(5);
+            maxHealth = new ReactiveProperty<int>(5);
         }
         private void OnEnable()
         {
@@ -78,9 +80,9 @@ namespace CombatSystem
         public void Heal(int amount)
         {
             currentHealth.Value += amount;
-            if (currentHealth.Value > maxHealth)
+            if (currentHealth.Value > maxHealth.Value)
             {
-                currentHealth.Value = maxHealth;
+                currentHealth.Value = maxHealth.Value;
             }
         }
         public void EnableHitbox(int index = -1)

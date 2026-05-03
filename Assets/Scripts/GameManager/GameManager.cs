@@ -143,13 +143,14 @@ namespace GameManagerScripts
         {
             Time.timeScale = 1f;
         }
-        public void PauseGameDuration(float duration = 0.2f)
+        public void PauseGameDuration(float duration = 0.2f, float delay = 0.1f)
         {
             // If the game is already paused, we don't want to start another pause coroutine
-            StartCoroutine(PauseGameForDuration(duration));
+            StartCoroutine(PauseGameForDuration(duration, delay));;
         }
-        private IEnumerator PauseGameForDuration(float duration)
+        private IEnumerator PauseGameForDuration(float duration, float delay)
         {
+            yield return new WaitForSecondsRealtime(delay);
             PauseGame();
             yield return new WaitForSecondsRealtime(duration);
             if (m_CurrentGameState != GameState.PauseScreen)

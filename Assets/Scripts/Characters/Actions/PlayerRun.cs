@@ -17,7 +17,7 @@ public class PlayerRun : ActionStateLogic
             actionHandler.ChangeState(actionHandler.GetState<PlayerAttack>());
             return;
         }
-        if (actionHandler._blackboard.Get<Vector2>("moveinput") == Vector2.zero)
+        if (actionHandler._blackboard.Get<Vector2>("moveinput").x == 0f)
         {
             actionHandler.ChangeState(actionHandler.GetState<PlayerIdle>());
             return;
@@ -32,6 +32,11 @@ public class PlayerRun : ActionStateLogic
             actionHandler.ChangeState(actionHandler.GetState<PlayerJump>());
             return;
         }
+        if (actionHandler._rigidBody2D.velocity.y < -0.5f)
+        {
+            actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
+        }
+
     }
     public override void OnExitState(CharacterActionHandler actionHandler)
     {
@@ -48,6 +53,6 @@ public class PlayerRun : ActionStateLogic
         Vector2 moveinput = actionHandler._blackboard.Get<Vector2>("moveinput");
         float moveSpeed = actionHandler._blackboard.Get<float>("movespeed");
         actionHandler.GetComponent<SpriteRenderer>().flipX = actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")) < 0;
-        actionHandler._rigidBody2D.velocity = new Vector2((moveinput.x > 0 ? 1 : -1) * moveSpeed, actionHandler._rigidBody2D.velocity.y);
+        actionHandler._rigidBody2D.velocity = new Vector2((moveinput.x == 0 ? 0 : (moveinput.x > 0 ? 1 : -1)) * moveSpeed, actionHandler._rigidBody2D.velocity.y);
     }
 }

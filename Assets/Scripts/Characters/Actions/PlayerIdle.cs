@@ -12,6 +12,7 @@ public class PlayerIdle : ActionStateLogic
             actionHandler._blackboard.Set<float>("originalgravity", actionHandler._rigidBody2D.gravityScale);  
         }
         actionHandler._rigidBody2D.gravityScale = actionHandler._blackboard.Get<float>("originalgravity");
+        actionHandler._rigidBody2D.velocity = new Vector2(0, actionHandler._rigidBody2D.velocity.y);
     }
     public override void FrameUpdate(CharacterActionHandler actionHandler)
     {
@@ -39,6 +40,11 @@ public class PlayerIdle : ActionStateLogic
             actionHandler.ChangeState(actionHandler.GetState<PlayerJump>());
             return;
         }
+        if (actionHandler._rigidBody2D.velocity.y < -0.5f)
+        {
+            actionHandler.ChangeState(actionHandler.GetState<PlayerFall>());
+        }
+
     }
     public override void OnExitState(CharacterActionHandler actionHandler)
     {

@@ -7,15 +7,23 @@ public class CharacterLogicHandler : MonoBehaviour
         AI,
         Player
     }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    public ControlType controlType;
+    public Blackboard blackboard;
+    public AILogic aiLogic;
 
-    // Update is called once per frame
+    private void Start()
+    {
+        blackboard = GetComponent<Blackboard>();
+        if (controlType == ControlType.AI && aiLogic != null)
+        {
+            aiLogic.OnEnterLogic(this);
+        }
+    }
     void Update()
     {
-        
+        if (controlType == ControlType.AI && aiLogic != null)
+        {
+            aiLogic.FrameUpdate(this);
+        }
     }
 }

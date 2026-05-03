@@ -5,6 +5,10 @@ using UnityEngine;
 public abstract class ActionStateLogic : ScriptableObject
 {
     public AnimationClip _animationClip;
+    public virtual void InitializeState(CharacterActionHandler actionHandler) 
+    { 
+    
+    }
     public virtual void OnEnterState(CharacterActionHandler actionHandler)
     {
     }

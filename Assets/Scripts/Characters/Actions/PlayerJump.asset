@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: PlayerJump
   m_EditorClassIdentifier: 
   _animationClip: {fileID: 7400000, guid: 6ab7ead19cf172649b72643431d9a31d, type: 2}
-  jumpForce: 15
+  jumpForce: 20
   normalGravity: 3
   earlyReleaseGravityMultiplier: 3

@@ -17,7 +17,7 @@ public class PlayerFall : ActionStateLogic
         Rigidbody2D rb = actionHandler._rigidBody2D;
 
         actionHandler._blackboard.Set<float>("originalGravity", rb.gravityScale);
-
+        rb.velocity = Vector2.zero;
         rb.gravityScale = fallGravity * fallGravityMultiplier;
     }
 
@@ -35,9 +35,9 @@ public class PlayerFall : ActionStateLogic
         CalculateMovement(actionHandler);
         if (GroundCheck(actionHandler))
         {
-            Vector2 move = PlayerInputManager.Instance.Move.ReadValue<Vector2>();
+            
 
-            bool isMoving = Mathf.Abs(move.x) > 0.1f;
+            bool isMoving = Mathf.Abs(actionHandler._blackboard.Get<Vector2>("moveinput").x) > 0.1f;
 
             if (isMoving)
             {
