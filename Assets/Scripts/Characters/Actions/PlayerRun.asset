@@ -20,4 +20,5 @@ MonoBehaviour:
     fadeInDuration: 1
     fadeOutDuration: 1
     soundClipAudioSource: {fileID: 0}
+  playerTurnAnimation: {fileID: 7400000, guid: 20548dce15a43eb4db15ab3de9fecca2, type: 2}
   footstepAudioTimer: 0.35

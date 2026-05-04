@@ -1,9 +1,12 @@
 using AudioManagerPackage;
+using CombatSystem;
+using System.Collections;
 using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerRun", menuName = "ActionStateLogic/PlayerRun", order = 1)]
 public class PlayerRun : ActionStateLogic
 {
+    public AnimationClip playerTurnAnimation;
     public float footstepAudioTimer = 1f;
     public override void OnEnterState(CharacterActionHandler actionHandler)
     {
@@ -12,6 +15,7 @@ public class PlayerRun : ActionStateLogic
         actionHandler._rigidBody2D.gravityScale = actionHandler._blackboard.Get<float>("originalgravity");
         actionHandler._blackboardTimer.AddTimerToBlackboard("footsteptimer",0f);
         PlayFootstep(actionHandler);
+        actionHandler._blackboard.Set<Vector2>("lastmovementdirection", actionHandler._blackboard.Get<Vector2>("moveinput"));
     }
     public override void FrameUpdate(CharacterActionHandler actionHandler)
     {
@@ -21,7 +25,7 @@ public class PlayerRun : ActionStateLogic
             actionHandler.ChangeState(actionHandler.GetState<PlayerAttack>());
             return;
         }
-        if (actionHandler._blackboard.Get<Vector2>("moveinput").x == 0f)
+        if (actionHandler._blackboard.Get<Vector2>("moveinput").x == 0f && !actionHandler._blackboard.Get<bool>("isturning"))
         {
             actionHandler.ChangeState(actionHandler.GetState<PlayerIdle>());
             return;
@@ -51,9 +55,12 @@ public class PlayerRun : ActionStateLogic
     {
         base.OnExitState(actionHandler);
 
+        actionHandler.StopAllCoroutines();
 
+        actionHandler._blackboard.Set<bool>("isturning", false);
         actionHandler._blackboard.Set<bool>("playfootstep", false);
         actionHandler._blackboardTimer.StopTimer("footsteptimer");
+        actionHandler.FlipSprite(actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")));
 
     }
     public override void PhysicsUpdate(CharacterActionHandler actionHandler)
@@ -72,7 +79,19 @@ public class PlayerRun : ActionStateLogic
 
         Vector2 moveinput = actionHandler._blackboard.Get<Vector2>("moveinput");
         float moveSpeed = actionHandler._blackboard.Get<float>("movespeed");
-        actionHandler.FlipSprite(actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")));
+        if (actionHandler.GetComponent<CombatEntity>().team == Team.Player)
+        {
+            if (moveinput.x != actionHandler.GetSpriteDirection())
+            {
+                TriggerTurning(actionHandler);
+            }
+        }
+        else
+        {
+            actionHandler.FlipSprite(actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")));
+        }
+           
+        actionHandler._blackboard.Set<Vector2>("lastmovementdirection", moveinput);
         actionHandler._rigidBody2D.velocity = new Vector2((moveinput.x == 0 ? 0 : (moveinput.x > 0 ? 1 : -1)) * moveSpeed, actionHandler._rigidBody2D.velocity.y);
     }
     public bool GroundCheck(CharacterActionHandler actionHandler)
@@ -84,6 +103,23 @@ public class PlayerRun : ActionStateLogic
         RaycastHit2D hit = Physics2D.BoxCast(position + offset, size, 0f, Vector2.down, 0.2f, layerMask);
         return hit.collider != null;
     } 
+    public void TriggerTurning(CharacterActionHandler actionHandler)
+    {
+        if (actionHandler._blackboard.Get<bool>("isturning"))
+            return;
+        actionHandler._blackboard.Set<bool>("isturning", true);
+        actionHandler.StopAllCoroutines();
+        actionHandler.StartCoroutine(TurnRoutine(actionHandler));
+    }
+    public IEnumerator TurnRoutine(CharacterActionHandler actionHandler)
+    {
+        actionHandler.GetComponent<Animator>().Play(playerTurnAnimation.name);
+        yield return new WaitForSeconds(playerTurnAnimation.length);
+        actionHandler.FlipSprite(actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")));
+        actionHandler.GetComponent<Animator>().Play(_animationClip.name);
+        actionHandler._blackboard.Set<bool>("isturning", false);
+
+    }
     private void PlayFootstep(CharacterActionHandler actionHandler)
     {
         SoundClipInfo newSoundClipWithPosition = _actionAudio.DeepCopy();
