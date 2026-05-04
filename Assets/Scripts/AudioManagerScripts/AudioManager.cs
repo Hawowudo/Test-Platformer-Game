@@ -311,22 +311,6 @@ public class AudioManager : MonoBehaviour
         }
 
     }
-    
-    // stops the first instance of a sound with the given name. If there are multiple instances of the same sound, only the first one found will be stopped.
-    // Use with caution, it's better to keep track of the SoundClipInfo reference if you want to stop a specific instance of a sound.
-    void StopSoundInstance(string name)
-    {
-        foreach (SoundClipInfo soundClipInfo in _soundInstanceList)
-        {
-            if (soundClipInfo.soundName.ToUpper() == name.ToUpper())
-            {
-                soundClipInfo.soundClipAudioSource.Stop();
-                UnityEngine.Object.Destroy(soundClipInfo.soundClipAudioSource.gameObject);
-                _soundInstanceList.Remove(soundClipInfo);
-                return;
-            }
-        }
-    }
     public void PlayAudioClipUnique( UniqueSoundClipInfo uniqueSoundClipInfo )
     {
         if (String.IsNullOrEmpty(uniqueSoundClipInfo.soundName))
@@ -370,6 +354,7 @@ public class AudioManager : MonoBehaviour
         source.pitch = reference.pitch;
     }
 
+    // Gets the audio pool for the given audio name. If the pool does not exist, it creates a new one and returns it.
     private AudioPool GetAudioPool(string audioName)
     {
         foreach (AudioPool pool in _audioPools)

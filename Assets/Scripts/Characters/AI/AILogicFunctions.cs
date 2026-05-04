@@ -3,6 +3,7 @@ using UnityEngine.Playables;
 
 namespace AILogicGroup
 {
+    // Common checks and functions for AI logic scripts
     public class AILogicFunctions : MonoBehaviour
     {
         public static AILogicFunctions Instance { get; private set; }

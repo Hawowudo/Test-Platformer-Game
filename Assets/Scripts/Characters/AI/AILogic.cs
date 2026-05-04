@@ -1,7 +1,7 @@
 using UnityEngine;
 
-
-//[CreateAssetMenu(fileName = "New AILogic", menuName = "AILogic/Basic")]
+// class is the base class for all AI logic.
+// Can be used to handle different logic, IE flyer logic, Patrol and chase logic, boss logic, etc.
 public abstract class AILogic : ScriptableObject
 {
     public virtual void OnEnterLogic(CharacterLogicHandler logicHandler)

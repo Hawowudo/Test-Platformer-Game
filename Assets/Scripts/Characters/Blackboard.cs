@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+//Handles runtime variables for both player and ai logic systems.
 public class Blackboard : MonoBehaviour
 {
     public enum ValueType

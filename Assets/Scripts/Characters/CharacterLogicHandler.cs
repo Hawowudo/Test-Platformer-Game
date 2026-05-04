@@ -1,6 +1,8 @@
 using CombatSystem;
 using UnityEngine;
 
+//Put this on an entity you want to be controlled by either a player or an AI logic.
+//It handles everything an entity might use.
 public class CharacterLogicHandler : MonoBehaviour
 {
     public enum ControlType
