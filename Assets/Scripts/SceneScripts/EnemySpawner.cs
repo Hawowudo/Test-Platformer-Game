@@ -42,7 +42,7 @@ namespace EnemySpawning
         private void SpawnAndTrack(EnemySpawnPoint spawnPoint)
         {
             GameObject enemy = SpawnEnemy(spawnPoint.enemyType, spawnPoint.transform.position);
-
+            AudioManager.instance.QuickPlayAudio("HEAL", enemy.transform.position);
             enemy.OnDisableAsObservable().Take(1).Delay(System.TimeSpan.FromSeconds(5)).Subscribe(_ =>
             {
                 SpawnAndTrack(spawnPoint);

@@ -74,7 +74,7 @@ public class CharacterActionHandler : MonoBehaviour
     }
     public int GetSign(Vector2 direction)
     {
-        _actionSign = direction.x >= 0 ? 1 : -1;
+        _actionSign = direction.x == 0 ? 0 : (direction.x > 0 ? 1 : -1);
         return _actionSign;
     }
 
@@ -83,5 +83,12 @@ public class CharacterActionHandler : MonoBehaviour
         if(_actionSign == 0) 
             _actionSign = _blackboard.Get<Vector2>("moveinput").x >= 0 ? 1 : -1;
         return _actionSign;
+    }
+
+    public void FlipSprite(int direction)
+    {
+        if (direction == 0)
+            return;
+        GetComponent<SpriteRenderer>().flipX = direction < 0;
     }
 }

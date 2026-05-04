@@ -69,10 +69,7 @@ namespace GameManagerScripts
                         SwitchGameState(GameState.Playing);
 
                         _playerInstance.GetComponent<CombatEntity>().currentHealth
-                        .Subscribe(hp => {
-                            if (FindAnyObjectByType<HealthBarScript>() == null) 
-                                return;
-                            FindAnyObjectByType<HealthBarScript>().UpdateHealthBar(hp, _playerInstance.GetComponent<CombatEntity>().maxHealth.Value); })
+                        .Subscribe(hp => { })
                         .AddTo(this);
                     });
                 })
@@ -106,6 +103,11 @@ namespace GameManagerScripts
                     PauseGame();
                     PlayerInputManager.Instance.ActivateActionMap(InputActionMapType.UI);
                     ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.PauseScreen);
+                    break;
+                case GameState.GameWin:
+                    PauseGame();
+                    PlayerInputManager.Instance.ActivateActionMap(InputActionMapType.UI);
+                    ScreenManager.Instance.ShowScreen(ScreenManager.ScreenType.GameWin);
                     break;
             }
         }
@@ -193,8 +195,25 @@ namespace GameManagerScripts
         public void OnPlayerFound()
         {
             _playerInstance.GetComponent<CombatEntity>().currentHealth
-            .Subscribe(hp => { if (hp <= 0) OnGameOver(); })
+            .Subscribe(hp => { 
+                if (hp <= 0) OnGameOver();
+                Debug.Log($"Player HP: {hp}");
+                PlayerHPUpdate(hp);
+                
+
+            })
             .AddTo(this);
+        }
+        public void PlayerHPUpdate(int hp)
+        {
+            if(_playerInstance == null)
+            {
+                return;
+            }
+            if (ScreenManager.Instance.GetComponentInChildren<HealthBarScript>() == null)
+                return;
+            if(_playerInstance.GetComponent<CombatEntity>().maxHealth != null)
+            ScreenManager.Instance.GetComponentInChildren<HealthBarScript>().UpdateHealthBar(hp, _playerInstance.GetComponent<CombatEntity>().maxHealth.Value);
         }
         public void StartPlayerSetup()
         {
@@ -221,7 +240,8 @@ namespace GameManagerScripts
         Playing=2,
         GameOver = 3,
         MainMenu = 4,
-        PauseScreen = 5
+        PauseScreen = 5,
+        GameWin = 6
     }
 
 

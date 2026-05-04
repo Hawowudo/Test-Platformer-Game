@@ -10,12 +10,13 @@ public class ScreenManager : MonoBehaviour
         PauseScreen,
         Gameplay,
         GameOver,
+        GameWin,
         none
     }
     public static ScreenManager Instance;
 
     public ScreenType screenType;
-    [SerializeField] private GameObject _mainMenuScreen, _pauseScreen, _gameplayScreen, _gameOverScreen;
+    [SerializeField] private GameObject _mainMenuScreen, _pauseScreen, _gameplayScreen, _gameOverScreen, _gameWinScreen;
 
     public bool debugMode;
     private ScreenType _previousScreenType;
@@ -54,6 +55,7 @@ public class ScreenManager : MonoBehaviour
         _pauseScreen.SetActive(type == ScreenType.PauseScreen);
         _gameplayScreen.SetActive(type == ScreenType.Gameplay);
         _gameOverScreen.SetActive(type == ScreenType.GameOver);
+        _gameWinScreen.SetActive(type == ScreenType.GameWin);
     }
 
 

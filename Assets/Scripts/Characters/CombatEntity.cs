@@ -17,6 +17,7 @@ namespace CombatSystem
 
         public int damage = 1;
         public Team team;
+        public bool EnableHitboxOnStart = false;
 
         public UnityEvent<CombatEntity> OnTakeHit;
         public UnityEvent OnDeath;
@@ -26,6 +27,17 @@ namespace CombatSystem
         private void Awake()
         {
             _blackboard = GetComponent<Blackboard>();
+
+        }
+        private void Start()
+        {
+            if (team != Team.Enemy)
+                ResetValues();
+
+            if (EnableHitboxOnStart)
+            {
+                EnableHitbox();
+            }
         }
         private void OnEnable()
         {
@@ -95,7 +107,14 @@ namespace CombatSystem
         {
             if (hitboxHandler == null)
                 return;
-            hitboxHandler.EnableHitBox(index);
+            if (index == -1)
+            {
+                hitboxHandler.EnableAllHitbox();
+            }
+            else
+            {
+                hitboxHandler.EnableHitBox(index);
+            }
         }
         public void DisableHitbox(int index = -1)
         {

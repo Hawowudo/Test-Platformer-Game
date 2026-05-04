@@ -11,15 +11,14 @@ namespace CombatSystem
         public LayerMask targetLayerMask;
         public GameObject[] hitBoxGroups;
         public UnityEvent<CombatEntity> onHitTarget;
-        public float hitCooldown = 0.5f;
+        public bool ResetHitboxOnDisable = true;
         private HashSet<CombatEntity> _currentHits = new HashSet<CombatEntity>();
         private bool _isCheckingHitboxes;
         public void EnableHitBox(int groupIndex)
         {
             if (_isCheckingHitboxes)
             {
-                Debug.Log("Blocked recursive EnableHitBox.");
-                return;
+                DisableAllHitbox();
             }
 
             Debug.Log($"{name} EnableHitbox called. Frame: {Time.frameCount}");
@@ -33,11 +32,16 @@ namespace CombatSystem
 
             DisableAllHitbox();
             hitBoxGroups[groupIndex].SetActive(true);
-            CheckActiveHitboxes();
 
-            _isCheckingHitboxes = false;
         }
-
+        public void EnableAllHitbox()
+        {
+            _isCheckingHitboxes = true;
+            foreach (GameObject hitbox in hitBoxGroups)
+            {
+                hitbox.SetActive(true);
+            }
+        }
         public void DisableHitBox(int groupIndex)
         {
             if (groupIndex < 0 || groupIndex >= hitBoxGroups.Length)
@@ -45,6 +49,7 @@ namespace CombatSystem
                 return;
             }
             DisableAllHitbox();
+            _isCheckingHitboxes = false;
         }
         public void SetDirection(int sign)
         {
@@ -60,11 +65,19 @@ namespace CombatSystem
             {
                 hitbox.SetActive(false);
             }
-            _currentHits.Clear();
+            if(ResetHitboxOnDisable)
+                _currentHits.Clear();
+        }
+        private void FixedUpdate()
+        {
+            if (_isCheckingHitboxes)
+            {
+                CheckActiveHitboxes();
+            }
+
         }
         private void CheckActiveHitboxes()
         {
-            Debug.Log("CheckActiveHitboxes CALLED");
             CombatEntity self = GetComponentInParent<CombatEntity>();
             foreach (GameObject hitbox in hitBoxGroups)
             {
@@ -113,6 +126,7 @@ namespace CombatSystem
 
                 if (!_currentHits.Contains(hurtboxHandler.GetCombatEntity()))
                 {
+                    if(ResetHitboxOnDisable)
                     _currentHits.Add(hurtboxHandler.GetCombatEntity());
                     onHitTarget?.Invoke(hurtboxHandler.GetCombatEntity());
                 }
