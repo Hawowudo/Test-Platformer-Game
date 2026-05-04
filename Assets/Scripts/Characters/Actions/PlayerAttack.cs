@@ -97,7 +97,7 @@ public class PlayerAttack : ActionStateLogic
     }
     private void SetupHitbox(CharacterActionHandler actionHandler)
     {
-        actionHandler.GetComponentInChildren<CombatEntity>().hitboxHandler.SetDirection(actionHandler.GetSign());
+        actionHandler.GetComponentInChildren<CombatEntity>().hitboxHandler.SetDirection( actionHandler.GetComponent<SpriteRenderer>().flipX ? -1 : 1 );
     }
     private void Attack(CharacterActionHandler actionHandler)
     {

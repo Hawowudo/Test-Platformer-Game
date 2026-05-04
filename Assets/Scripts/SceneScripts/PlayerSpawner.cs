@@ -3,6 +3,16 @@ using UnityEngine;
 
 public class PlayerSpawner : MonoBehaviour
 {
+    public static PlayerSpawner Instance { get; private set; }
+    void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+    }
     public static Subject<PlayerSpawner> OnPlayerSpawned = new Subject<PlayerSpawner>();
     public Transform spawnPosition;
     void Start()

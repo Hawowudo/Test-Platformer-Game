@@ -8,6 +8,10 @@ public abstract class AILogic : ScriptableObject
     {
 
     }
+    public virtual void OnExitLogic(CharacterLogicHandler logicHandler)
+    {
+
+    }
     public virtual void FrameUpdate(CharacterLogicHandler logicHandler)
     {
 

@@ -1,5 +1,8 @@
+using CombatSystem;
 using System.Collections;
 using System.Collections.Generic;
+using UniRx;
+using UniRx.Triggers;
 using UnityEngine;
 
 namespace EnemySpawning
@@ -22,21 +25,30 @@ namespace EnemySpawning
         public List<GameObject> PatrollerPool = new List<GameObject>();
         public List<GameObject> FlyerPool = new List<GameObject>();
         public List<GameObject> ChargerPool = new List<GameObject>();
+
         [Header("Scene specific")]
         public List<EnemySpawnPoint> SceneSpawnPoints = new List<EnemySpawnPoint>();
 
-        private void Start()
-        {
-            SpawnSceneEnemies();
-        }
+        //called by gamemanager
         public void SpawnSceneEnemies()
         {
             foreach (EnemySpawnPoint spawnPoint in SceneSpawnPoints)
             {
-                SpawnEnemy(spawnPoint.enemyType, spawnPoint.transform.position);
+                SpawnAndTrack(spawnPoint);
+                // if it gets disabled, spawn another enemy after 5 seconds
+
             }
         }
-        public void SpawnEnemy(EnemyType type, Vector2 position)
+        private void SpawnAndTrack(EnemySpawnPoint spawnPoint)
+        {
+            GameObject enemy = SpawnEnemy(spawnPoint.enemyType, spawnPoint.transform.position);
+
+            enemy.OnDisableAsObservable().Take(1).Delay(System.TimeSpan.FromSeconds(5)).Subscribe(_ =>
+            {
+                SpawnAndTrack(spawnPoint);
+            }).AddTo(this);
+        }
+        public GameObject SpawnEnemy(EnemyType type, Vector2 position)
         {
             GameObject enemyToSpawn = null;
             switch (type)
@@ -57,6 +69,8 @@ namespace EnemySpawning
             }
             enemyToSpawn.transform.position = position;
             enemyToSpawn.SetActive(true);
+            enemyToSpawn.GetComponent<CharacterLogicHandler>().ResetEnemy();
+            return enemyToSpawn;
         }
         public GameObject GetInactiveEnemyFromList(List<GameObject> list)
         {

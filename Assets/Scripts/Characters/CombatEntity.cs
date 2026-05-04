@@ -29,7 +29,6 @@ namespace CombatSystem
         }
         private void OnEnable()
         {
-            ResetValues();
             if (hitboxHandler != null)
             {
                 hitboxHandler.onHitTarget.AddListener(OnDamageOther);
@@ -45,10 +44,11 @@ namespace CombatSystem
         }
 
         #endregion
-        private void ResetValues()
+        public void ResetValues()
         {
             currentHealth = new ReactiveProperty<int>(5);
             maxHealth = new ReactiveProperty<int>(5);
+            EnableHurtbox();
         }
         public void OnDamageOther(CombatEntity toDamage)
         {
@@ -107,7 +107,13 @@ namespace CombatSystem
         {
             if (hurtboxHandler == null)
                 return;
-            //hurtboxHandler.EnableHurtBox();
+            hurtboxHandler.EnableHurtbox();
+        }
+        public void DisableHurtBox()
+        {
+            if (hurtboxHandler == null)
+                return;
+            hurtboxHandler.DisableHurtbox();
         }
     }
 

@@ -1,7 +1,11 @@
 using EnemySpawning;
 using UnityEngine;
 
-public class EnemySpawnPoint : MonoBehaviour
+namespace EnemySpawning
 {
-    public EnemyType enemyType;
+    public class EnemySpawnPoint : MonoBehaviour
+    {
+        public EnemyType enemyType;
+    }
+
 }

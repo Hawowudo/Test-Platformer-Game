@@ -19,16 +19,14 @@ public class CharacterActionHandler : MonoBehaviour
     int _actionSign = 0;
 
     #region Unity Functions
-    void Start()
+    void Awake()
     {
         _blackboard = GetComponent<Blackboard>();
         _rigidBody2D = GetComponent<Rigidbody2D>();
         _blackboardTimer = GetComponent<BlackboardTimer>();
-        _currentState = _initialState;
-        _currentState.OnEnterState(this);
 
-        if (debugMode)
-            debugText.text = _currentState.GetType().Name;
+        //if (debugMode)
+        //    debugText.text = _currentState.GetType().Name;
     }
     void Update()
     {
@@ -40,7 +38,11 @@ public class CharacterActionHandler : MonoBehaviour
     }
     #endregion
 
-
+    // called by enemy spawning system
+    public void SetToInitialState()
+    {
+        ChangeState(_initialState);
+    }
     public void ChangeState(ActionStateLogic newState)
     {
         if (newState == null || newState == _currentState)
@@ -48,7 +50,8 @@ public class CharacterActionHandler : MonoBehaviour
         //Debug.Log($"Changing state from {_currentState.GetType().Name} to {newState.GetType().Name}");
         if(debugMode)
             debugText.text = newState.GetType().Name;
-        _currentState.OnExitState(this);
+        if(_currentState != null)
+            _currentState.OnExitState(this);
 
         _currentState = newState;
         _currentState.OnEnterState(this);
@@ -77,6 +80,8 @@ public class CharacterActionHandler : MonoBehaviour
 
     public int GetSign()
     {
+        if(_actionSign == 0) 
+            _actionSign = _blackboard.Get<Vector2>("moveinput").x >= 0 ? 1 : -1;
         return _actionSign;
     }
 }

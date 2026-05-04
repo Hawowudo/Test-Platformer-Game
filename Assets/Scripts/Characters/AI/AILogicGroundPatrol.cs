@@ -35,6 +35,11 @@ public class AILogicGroundPatrol : AILogic
         GetBlackboard(logicHandler).Set<bool>("playerdetected", false);
         StartPatrol(logicHandler);
     }
+    public override void OnExitLogic(CharacterLogicHandler logicHandler)
+    {
+        base.OnExitLogic(logicHandler);
+        logicHandler.StopAllCoroutines();
+    }
     public override void FrameUpdate(CharacterLogicHandler logicHandler)
     {
         if (GetBlackboard(logicHandler).Get<GameObject>("target") == null)
@@ -54,6 +59,10 @@ public class AILogicGroundPatrol : AILogic
         {
             GetBlackboard(logicHandler).Set<bool>("playerdetected", true);
             StartChase(logicHandler);
+        }
+        if (GetBlackboard(logicHandler).Get<bool>("isdead"))
+        {
+            logicHandler.DisableLogic();
         }
     }
     public override Blackboard GetBlackboard(CharacterLogicHandler logicHandler)
@@ -111,6 +120,9 @@ public class AILogicGroundPatrol : AILogic
     }
     IEnumerator Attack(CharacterLogicHandler logicHandler)
     {
+        GameObject target = GetBlackboard(logicHandler).Get<GameObject>("target");
+        Vector2 directionToTarget = (target.transform.position - logicHandler.transform.position).normalized;
+        logicHandler.GetComponent<CharacterActionHandler>().GetSign(directionToTarget);
         GetBlackboard(logicHandler).Set<bool>("attackpressed", true);
         yield return new WaitForSeconds(attackDuration);
     }
@@ -148,19 +160,19 @@ public class AILogicGroundPatrol : AILogic
 
     public bool GroundAheadCheck(CharacterLogicHandler logicHandler)
     {
-        return AILogicFunctions.GroundAheadCheck(logicHandler.transform.position, Vector2.up/2, GetBlackboard(logicHandler).Get<int>("facedirection"), GroundCheckDistance, GroundCheckDistanceFromBody, GroundMask);
+        return AILogicFunctions.Instance.GroundAheadCheck(logicHandler.transform.position, Vector2.up/2, GetBlackboard(logicHandler).Get<int>("facedirection"), GroundCheckDistance, GroundCheckDistanceFromBody, GroundMask);
     }
     public bool WallCheck(CharacterLogicHandler logicHandler)
     {
-        return AILogicFunctions.WallCheck(logicHandler.transform.position, Vector2.up ,GetBlackboard(logicHandler).Get<int>("facedirection"), GroundCheckDistance, GroundMask);
+        return AILogicFunctions.Instance.WallCheck(logicHandler.transform.position, Vector2.up ,GetBlackboard(logicHandler).Get<int>("facedirection"), GroundCheckDistance, GroundMask);
     }
     public bool GroundCheck(CharacterLogicHandler logicHandler)
     {
-        return AILogicFunctions.GroundCheck(logicHandler.transform.position, Vector2.up / 2, new Vector2(0.5f, 1f), GroundMask);
+        return AILogicFunctions.Instance.GroundCheck(logicHandler.transform.position, Vector2.up / 2, new Vector2(0.5f, 1f), GroundMask);
     }
     public bool PlayerForwardDetection(CharacterLogicHandler logicHandler)
     {
-        Collider2D playerHit = AILogicFunctions.BoxCheckAnchored((Vector2)logicHandler.transform.position + Vector2.up, GetBlackboard(logicHandler).Get<int>("facedirection"), PlayerForwardDetectionDistance, 3f, PlayerMask);
+        Collider2D playerHit = AILogicFunctions.Instance.BoxCheckAnchored((Vector2)logicHandler.transform.position + Vector2.up, GetBlackboard(logicHandler).Get<int>("facedirection"), PlayerForwardDetectionDistance, 3f, PlayerMask);
         return playerHit != null;
     }
     public bool PlayerSightCheck(CharacterLogicHandler logicHandler)
@@ -169,7 +181,7 @@ public class AILogicGroundPatrol : AILogic
         if (target == null)
             return false;
 
-        return !AILogicFunctions.LineCheck((Vector2)logicHandler.transform.position + Vector2.up, (Vector2)target.transform.position + Vector2.up, 0.5f, GroundMask);
+        return !AILogicFunctions.Instance.LineCheck((Vector2)logicHandler.transform.position + Vector2.up, (Vector2)target.transform.position + Vector2.up, 0.5f, GroundMask);
     }
     public bool PlayerDistanceCheck(CharacterLogicHandler logicHandler)
     {
@@ -189,7 +201,7 @@ public class AILogicGroundPatrol : AILogic
         if (GetBlackboard(logicHandler).Get<GameObject>("target") != null)
             return;
 
-        Collider2D playerHit = AILogicFunctions.BoxCheck((Vector2)logicHandler.transform.position + Vector2.up,  new Vector2(PlayerDetectionDistance, PlayerDetectionDistance), PlayerMask);
+        Collider2D playerHit = AILogicFunctions.Instance.BoxCheck((Vector2)logicHandler.transform.position + Vector2.up,  new Vector2(PlayerDetectionDistance, PlayerDetectionDistance), PlayerMask);
         if (playerHit != null) 
         GetBlackboard(logicHandler).Set<GameObject>("target", playerHit.gameObject);
     }

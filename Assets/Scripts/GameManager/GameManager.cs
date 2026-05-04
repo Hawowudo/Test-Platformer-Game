@@ -1,4 +1,5 @@
 using CombatSystem;
+using EnemySpawning;
 using InputManagerScripts;
 using System.Collections;
 using System.Linq;
@@ -111,21 +112,16 @@ namespace GameManagerScripts
         #region Saves
         public void LoadNewScene(string sceneName)
         {
-            //StartCoroutine(LoadScene(sceneName));
-            SceneManager.LoadScene(sceneName);
+            StartCoroutine(LoadScene(sceneName));
         }
         IEnumerator LoadScene(string sceneName)
         {
-            string activeSceneName = SceneManager.GetActiveScene().name;
-            AsyncOperation loadScene = SceneManager.LoadSceneAsync(
-            sceneName,
-            LoadSceneMode.Additive
-            );
+            AsyncOperation loadScene = SceneManager.LoadSceneAsync("FOREST_CHUNK_1", LoadSceneMode.Single);
             loadScene.allowSceneActivation = false;
-            
+
             while (!loadScene.isDone)
             {
-                if (loadScene.progress >= 0.9f)
+                if (loadScene.progress >= .9f)
                 {
                     break;
                 }
@@ -136,12 +132,7 @@ namespace GameManagerScripts
             {
                 yield return null;
             }
-
-            AsyncOperation unloadScene = SceneManager.UnloadSceneAsync(SceneManager.GetSceneByName(activeSceneName));
-            while (!unloadScene.isDone)
-            {
-                yield return null;
-            }
+            FindAnyObjectByType<EnemySpawner>().SpawnSceneEnemies();
         }
         #endregion
 

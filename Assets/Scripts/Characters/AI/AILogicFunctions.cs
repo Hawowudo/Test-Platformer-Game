@@ -3,9 +3,19 @@ using UnityEngine.Playables;
 
 namespace AILogicGroup
 {
-    public static class AILogicFunctions
+    public class AILogicFunctions : MonoBehaviour
     {
-        public static bool WallCheck(Vector2 origin, Vector2 offset, int direction,float distance,LayerMask wallMask)
+        public static AILogicFunctions Instance { get; private set; }
+        private void Awake()
+        {
+            if (Instance != null && Instance != this)
+            {
+                Destroy(gameObject);
+                return;
+            }
+            Instance = this;
+        }
+        public bool WallCheck(Vector2 origin, Vector2 offset, int direction,float distance,LayerMask wallMask)
         {
             origin = origin + offset;
             Vector2 rayDir =Vector2.right * direction;
@@ -14,7 +24,7 @@ namespace AILogicGroup
             //    Debug.DrawRay( origin, rayDir * distance, Color.red, 0.05f);
             return hit.collider != null;
         }
-        public static bool GroundAheadCheck(Vector2 origin, Vector2 offset, int direction,float raydistance, float distanceFromBody, LayerMask groundMask)
+        public bool GroundAheadCheck(Vector2 origin, Vector2 offset, int direction,float raydistance, float distanceFromBody, LayerMask groundMask)
         {
             origin = origin + offset ;
             Vector2 rayDir = (Vector2.down) .normalized;
@@ -27,7 +37,7 @@ namespace AILogicGroup
             //}
             return hit.collider != null;
         }
-        public static bool GroundCheck(Vector2 origin, Vector2 offset, Vector2 boxSize, LayerMask groundMask)
+        public bool GroundCheck(Vector2 origin, Vector2 offset, Vector2 boxSize, LayerMask groundMask)
         {
             origin = origin + offset;
             Collider2D hit = Physics2D.OverlapBox(origin, boxSize, 0f, groundMask);
@@ -40,7 +50,7 @@ namespace AILogicGroup
             //}
             return hit != null;
         }
-        public static Collider2D BoxCheck(Vector2 origion, Vector2 size, LayerMask detectionMask)
+        public Collider2D BoxCheck(Vector2 origion, Vector2 size, LayerMask detectionMask)
         {
             Collider2D hit = Physics2D.OverlapBox(origion, size, 0f, detectionMask);
             if (Time.frameCount % 12 == 0)
@@ -50,7 +60,7 @@ namespace AILogicGroup
             return hit;
 
         }
-        public static Collider2D BoxCheckAnchored( Vector2 anchorPoint, int direction, float width, float height, LayerMask detectionMask)
+        public Collider2D BoxCheckAnchored( Vector2 anchorPoint, int direction, float width, float height, LayerMask detectionMask)
         {
             Vector2 boxCenter = anchorPoint + Vector2.right * direction * width / 2;
             Vector2 boxSize = new Vector2(width, height);
@@ -65,7 +75,7 @@ namespace AILogicGroup
             return hit;
         }
 
-        public static bool LineCheck(Vector2 origin, Vector2 targetPos, float lineWidth, LayerMask obstacleMask)
+        public bool LineCheck(Vector2 origin, Vector2 targetPos, float lineWidth, LayerMask obstacleMask)
         {
             Vector2 direction = (targetPos - origin).normalized;
             float distance =  Vector2.Distance(origin, targetPos);
@@ -77,12 +87,12 @@ namespace AILogicGroup
 
             return hit;
         }
-        public static bool CircleCheck( Vector2 origin, float radius, LayerMask targetMask)
+        public bool CircleCheck( Vector2 origin, float radius, LayerMask targetMask)
         {
             Collider2D hit = Physics2D.OverlapCircle( origin, radius,  targetMask);
             return hit != null;
         }
-        private static void DrawBox( Vector2 center, Vector2 size, Vector2 direction)
+        private void DrawBox( Vector2 center, Vector2 size, Vector2 direction)
         {
             return;
             Vector2 right =

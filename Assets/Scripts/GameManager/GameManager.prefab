@@ -35,6 +35,7 @@ Transform:
   - {fileID: 587073676999746443}
   - {fileID: 869391567244272199}
   - {fileID: 1523137257062110055}
+  - {fileID: 1819840619888876639}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &5964603670080836209
@@ -52,6 +53,50 @@ MonoBehaviour:
   playerPrefab: {fileID: 9121831448378335390, guid: 572db7790038acc4380dfa47798274bd, type: 3}
   _menuOpenCloseInputBufferTime: 0.1
   _quickPlay: 0
+--- !u!1 &3174319646989589389
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1819840619888876639}
+  - component: {fileID: 2850876364445792382}
+  m_Layer: 0
+  m_Name: AILogicManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1819840619888876639
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174319646989589389}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 8231866227038705296}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2850876364445792382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3174319646989589389}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42ff3387223129247abfa3f5f34b5aee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &6699320557930161769
 GameObject:
   m_ObjectHideFlags: 0
@@ -188,7 +233,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2542636551986098353, guid: 9830a04c50aa42b488b0f9c386c200f7, type: 3}
       propertyPath: hitStopDuration
-      value: 0.1
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 2542636551986098353, guid: 9830a04c50aa42b488b0f9c386c200f7, type: 3}
       propertyPath: cameraShakeForce

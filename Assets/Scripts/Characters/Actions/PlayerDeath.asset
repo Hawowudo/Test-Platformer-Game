@@ -13,3 +13,4 @@ MonoBehaviour:
   m_Name: PlayerDeath
   m_EditorClassIdentifier: 
   _animationClip: {fileID: 7400000, guid: b4e6c9753287298469bd344bd4eddcfb, type: 2}
+  _despawnDelay: 5

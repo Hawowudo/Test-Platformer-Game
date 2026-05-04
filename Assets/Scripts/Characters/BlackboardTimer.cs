@@ -12,9 +12,9 @@ public class BlackboardTimer : MonoBehaviour
         _blackboard = GetComponent<Blackboard>();
         _timerNames = new List<string>();
     }
-    public void AddTimerToBlackboard(string key, float initialValue = 0.01f)
+    public void AddTimerToBlackboard(string key, float value = 0.01f)
     {
-        _blackboard.Set<float>(key, (float)initialValue);
+        _blackboard.Set<float>(key, (float)value);
         _timerNames.Add(key);
     }
     public void StopTimer(string key)
@@ -25,6 +25,18 @@ public class BlackboardTimer : MonoBehaviour
             _timerNames.Remove(key);
         }
     }
+    public void StopAllTimers()
+    {
+        foreach (string timerName in _timerNames)
+        {
+            if (_blackboard.HasKey(timerName))
+            {
+                _blackboard.Set<float>(timerName, 0f);
+            }
+        }
+        _timerNames.Clear();
+    }
+
 
     private void Update()
     {

@@ -1,3 +1,4 @@
+using CombatSystem;
 using UnityEngine;
 
 public class CharacterLogicHandler : MonoBehaviour
@@ -7,17 +8,20 @@ public class CharacterLogicHandler : MonoBehaviour
         AI,
         Player
     }
-    public ControlType controlType;
     public Blackboard blackboard;
-    public AILogic aiLogic;
+    public BlackboardTimer blackboardTimer;
+    public CharacterActionHandler actionHandler;
+    public CombatEntity combatEntity;
 
+    [Header("Logic Settings")]
+    public ControlType controlType;
+    public AILogic aiLogic;
+    
     private void Start()
     {
+        actionHandler = GetComponent<CharacterActionHandler>();
+        combatEntity = GetComponent<CombatEntity>();
         blackboard = GetComponent<Blackboard>();
-        if (controlType == ControlType.AI && aiLogic != null)
-        {
-            aiLogic.OnEnterLogic(this);
-        }
     }
     void Update()
     {
@@ -25,5 +29,23 @@ public class CharacterLogicHandler : MonoBehaviour
         {
             aiLogic.FrameUpdate(this);
         }
+    }
+    public void DisableLogic()
+    {
+        if (controlType == ControlType.AI && aiLogic != null)
+        {
+            aiLogic.OnExitLogic(this);
+        }
+
+    }
+        public void ResetEnemy()
+    {
+        if (controlType != ControlType.AI || aiLogic == null)
+            return;
+
+        aiLogic.OnEnterLogic(this);
+        actionHandler.SetToInitialState();
+        combatEntity.ResetValues();
+        combatEntity.EnableHurtbox();
     }
 }
