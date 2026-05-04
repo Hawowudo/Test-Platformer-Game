@@ -13,4 +13,11 @@ MonoBehaviour:
   m_Name: PlayerHit
   m_EditorClassIdentifier: 
   _animationClip: {fileID: 7400000, guid: 9e192fb9c2c9b264ebb81d45b8b9e403, type: 2}
+  _actionAudio:
+    soundName: HURT
+    pitch: 0.6
+    position: {x: 0, y: 0}
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    soundClipAudioSource: {fileID: 0}
   hitDuration: 0.25

@@ -64,6 +64,7 @@ public class PlayerFall : ActionStateLogic
         base.OnExitState(actionHandler);
 
         actionHandler._rigidBody2D.gravityScale = actionHandler._blackboard.Get<float>("originalGravity");
+        PlayAudio(actionHandler);
     }
 
 
@@ -74,7 +75,7 @@ public class PlayerFall : ActionStateLogic
         float moveSpeed = actionHandler._blackboard.Get<float>("movespeed");
         if(moveinput.x != 0)
         {
-            actionHandler.GetComponent<SpriteRenderer>().flipX = actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")) < 0;
+            actionHandler.FlipSprite(actionHandler.GetSign(actionHandler._blackboard.Get<Vector2>("moveinput")));
         }
         actionHandler._rigidBody2D.velocity = new Vector2(moveinput.x * moveSpeed, actionHandler._rigidBody2D.velocity.y);
     }

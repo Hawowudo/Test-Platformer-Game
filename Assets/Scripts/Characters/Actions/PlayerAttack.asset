@@ -13,6 +13,13 @@ MonoBehaviour:
   m_Name: PlayerAttack
   m_EditorClassIdentifier: 
   _animationClip: {fileID: 7400000, guid: 69ba3e411527a3940ad389ebc660cde1, type: 2}
+  _actionAudio:
+    soundName: SWORDSLASH1
+    pitch: 0.5
+    position: {x: 0, y: 0}
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    soundClipAudioSource: {fileID: 0}
   _animationClip2: {fileID: 7400000, guid: f3b5a3736b4ec784cab94b35e61a5e82, type: 2}
   attackqueuedelay: 0.2
   attackComboDelay: 0.5

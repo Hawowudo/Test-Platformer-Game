@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using AudioManagerPackage;
+using UnityEngine;
 
 [CreateAssetMenu(fileName = "PlayerJump", menuName = "ActionStateLogic/PlayerJump")]
 public class PlayerJump : ActionStateLogic
@@ -23,6 +24,8 @@ public class PlayerJump : ActionStateLogic
         rb.velocity = new Vector2( rb.velocity.x,jumpForce);
 
         rb.gravityScale = normalGravity;
+
+        PlayAudio(actionHandler);
     }
 
 

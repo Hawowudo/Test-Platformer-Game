@@ -13,6 +13,13 @@ MonoBehaviour:
   m_Name: PlayerJump
   m_EditorClassIdentifier: 
   _animationClip: {fileID: 7400000, guid: 6ab7ead19cf172649b72643431d9a31d, type: 2}
-  jumpForce: 20
+  _actionAudio:
+    soundName: JUMP
+    pitch: 0.75
+    position: {x: 0, y: 0}
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    soundClipAudioSource: {fileID: 0}
+  jumpForce: 25
   normalGravity: 3
   earlyReleaseGravityMultiplier: 3

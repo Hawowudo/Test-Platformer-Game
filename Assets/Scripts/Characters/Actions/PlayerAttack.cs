@@ -1,4 +1,5 @@
-﻿using CombatSystem;
+﻿using AudioManagerPackage;
+using CombatSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -104,6 +105,7 @@ public class PlayerAttack : ActionStateLogic
         ComboCheck(actionHandler);
         ResetCooldown(actionHandler);
         int attackIndex = actionHandler._blackboard.Get<int>(ATTACK_INDEX_KEY);
+        PlaySlash(actionHandler);
         switch (attackIndex)
         {
             case 0:
@@ -127,5 +129,11 @@ public class PlayerAttack : ActionStateLogic
             actionHandler._blackboard.Set(ATTACK_INDEX_KEY, 0);
             return;
         }
+    }
+    private void PlaySlash(CharacterActionHandler actionHandler)
+    {
+        SoundClipInfo newSoundClipWithPosition = _actionAudio.DeepCopy();
+        newSoundClipWithPosition.position = actionHandler.transform.position;
+        AudioManager.instance.PlayAudioClipInstance(newSoundClipWithPosition);
     }
 }

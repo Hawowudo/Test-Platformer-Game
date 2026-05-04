@@ -13,3 +13,11 @@ MonoBehaviour:
   m_Name: PlayerRun
   m_EditorClassIdentifier: 
   _animationClip: {fileID: 7400000, guid: 781f624cf9a841e4ba38941b70dd5b90, type: 2}
+  _actionAudio:
+    soundName: STEP
+    pitch: 0.75
+    position: {x: 0, y: 0}
+    fadeInDuration: 1
+    fadeOutDuration: 1
+    soundClipAudioSource: {fileID: 0}
+  footstepAudioTimer: 0.35

@@ -1,4 +1,5 @@
 using AILogicGroup;
+using AudioManagerPackage;
 using System.Collections;
 using UnityEngine;
 
@@ -17,6 +18,8 @@ public class AILogicGroundPatrol : AILogic
     public float stopDistance = 3f;
     public float attackPause = 2f;
     public float attackDuration = 2f;
+    public SoundClipInfo attackIndicatorAudio;
+
     [Header("Patrol settings")]
     public float turnPauseDuration = 2f;
 
@@ -81,10 +84,8 @@ public class AILogicGroundPatrol : AILogic
                 continue;
             }
             
-            if ((!GroundAheadCheck(logicHandler) || WallCheck(logicHandler))
-                && Time.frameCount % FrameCountToCheckForGround == 0)
+            if ((!GroundAheadCheck(logicHandler) || WallCheck(logicHandler)))
             {
-                GetBlackboard(logicHandler).Set<Vector2>("previousmoveinput", GetBlackboard(logicHandler).Get<Vector2>("moveinput") );
                 GetBlackboard(logicHandler).Set<Vector2>("moveinput", Vector2.zero);
                 yield return TurnAround(logicHandler);
                 MoveForward(logicHandler);
@@ -104,12 +105,23 @@ public class AILogicGroundPatrol : AILogic
     IEnumerator ChaseState(CharacterLogicHandler logicHandler)
     {
         GetBlackboard(logicHandler).Set<string>("currentstate", "chase");
+        MoveTowardsTarget(logicHandler);
         while (PlayerSightCheck(logicHandler) && PlayerHeightCheck(logicHandler) && PlayerDistanceCheck(logicHandler))
         {
-            MoveTowardsTarget(logicHandler);
+            if (GroundAheadCheck(logicHandler))
+            {
+                MoveTowardsTarget(logicHandler);
+            } else
+            {
+                GetBlackboard(logicHandler).Set<Vector2>("moveinput", Vector2.zero);
+            }
+
             while (CheckXDistance(logicHandler))
             {
                 GetBlackboard(logicHandler).Set<Vector2>("moveinput", Vector2.zero);
+
+                LookAtTarget(logicHandler);
+                PlayAttackAudio(logicHandler);
                 CombatSystem.CombatManager.instance.AttackFlash(logicHandler.GetComponent<SpriteRenderer>());
                 yield return new WaitForSeconds(attackPause);
                 yield return Attack(logicHandler);
@@ -120,9 +132,6 @@ public class AILogicGroundPatrol : AILogic
     }
     IEnumerator Attack(CharacterLogicHandler logicHandler)
     {
-        GameObject target = GetBlackboard(logicHandler).Get<GameObject>("target");
-        Vector2 directionToTarget = (target.transform.position - logicHandler.transform.position).normalized;
-        logicHandler.GetComponent<CharacterActionHandler>().GetSign(directionToTarget);
         GetBlackboard(logicHandler).Set<bool>("attackpressed", true);
         yield return new WaitForSeconds(attackDuration);
     }
@@ -130,6 +139,18 @@ public class AILogicGroundPatrol : AILogic
     {
         yield return new WaitForSeconds(turnPauseDuration);
         GetBlackboard(logicHandler).Set<int>("facedirection", -GetBlackboard(logicHandler).Get<int>("facedirection"));
+        logicHandler.actionHandler.FlipSprite(GetBlackboard(logicHandler).Get<int>("facedirection"));
+    }
+    public void LookAtTarget(CharacterLogicHandler logicHandler)
+    {
+        GameObject target = GetBlackboard(logicHandler).Get<GameObject>("target");
+        if (target == null)
+            return;
+
+        Vector2 directionToTarget = (target.transform.position - logicHandler.transform.position).normalized;
+        GetBlackboard(logicHandler).Set<int>("facedirection", directionToTarget.x > 0 ? 1 : -1);
+        logicHandler.actionHandler.FlipSprite (GetBlackboard(logicHandler).Get<int>("facedirection"));
+
     }
     public void MoveTowardsTarget(CharacterLogicHandler logicHandler)
     {
@@ -204,5 +225,11 @@ public class AILogicGroundPatrol : AILogic
         Collider2D playerHit = AILogicFunctions.Instance.BoxCheck((Vector2)logicHandler.transform.position + Vector2.up,  new Vector2(PlayerDetectionDistance, PlayerDetectionDistance), PlayerMask);
         if (playerHit != null) 
         GetBlackboard(logicHandler).Set<GameObject>("target", playerHit.gameObject);
+    }
+    public virtual void PlayAttackAudio(CharacterLogicHandler logicHandler)
+    {
+        SoundClipInfo newSoundClipWithPosition = attackIndicatorAudio.DeepCopy();
+        newSoundClipWithPosition.position = logicHandler.transform.position;
+        AudioManager.instance.PlayAudioClipInstance(newSoundClipWithPosition);
     }
 }

@@ -13,3 +13,12 @@ MonoBehaviour:
   m_Name: PlayerFall
   m_EditorClassIdentifier: 
   _animationClip: {fileID: 7400000, guid: 3084e73a4ad56524499bd69f2095392b, type: 2}
+  _actionAudio:
+    soundName: LAND
+    pitch: 1
+    position: {x: 0, y: 0}
+    fadeInDuration: 0
+    fadeOutDuration: 0
+    soundClipAudioSource: {fileID: 0}
+  fallGravity: 3
+  fallGravityMultiplier: 2

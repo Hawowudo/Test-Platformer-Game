@@ -11,10 +11,9 @@ public class AudioManager : MonoBehaviour
     public VolumeValues currentVolumeValues = new();
 
     public AudioFileLibraryScriptableObject SFX;
-    public AudioFileLibraryScriptableObject Characters;
     public AudioFileLibraryScriptableObject Music;
-    private List<Sound> soundLibrary = new List<Sound>();
-
+    private List<Sound> _soundLibrary = new List<Sound>();
+    private HashSet<AudioPool> _audioPools = new HashSet<AudioPool>();
 
     public bool DebugMode;
     public bool soundTrigger;
@@ -50,7 +49,6 @@ public class AudioManager : MonoBehaviour
     private void Start()
     {
         AddToSounds(SFX.AudioLibrary);
-        AddToSounds(Characters.AudioLibrary);
         AddToSounds(Music.AudioLibrary);
 
         SetupSounds();
@@ -77,8 +75,6 @@ public class AudioManager : MonoBehaviour
             if (_persistentAudios.ContainsKey(debugMusicName.uniqueTrackID))
             {
                 var audioSources = _persistentAudios[debugMusicName.uniqueTrackID];
-                StartCoroutine(FadeOutAudioClip(audioSources.source1, debugMusicName.previousSoundFadeOutDuration));
-                StartCoroutine(FadeOutAudioClip(audioSources.source2, debugMusicName.previousSoundFadeOutDuration));
             }
         }
 
@@ -98,7 +94,7 @@ public class AudioManager : MonoBehaviour
     VolumeValues GetSavedVolumeValues()
     {
         VolumeValues savedValues = new VolumeValues();
-        savedValues.masterVolume = PlayerPrefs.GetFloat("MasterVolume", 0.1f);
+        savedValues.masterVolume = PlayerPrefs.GetFloat("MasterVolume", 1f);
         savedValues.sfxVolume = PlayerPrefs.GetFloat("SFXVolume", 1f);
         savedValues.characterVolume = PlayerPrefs.GetFloat("CharacterVolume", 1f);
         savedValues.musicVolume = PlayerPrefs.GetFloat("MusicVolume", 1f);
@@ -107,7 +103,6 @@ public class AudioManager : MonoBehaviour
     void UpdateAllVolumes()
     {
         UpdateVolume(SFX);
-        UpdateVolume(Characters);
         UpdateVolume(Music);
         UpdateActiveSoundSourceVolumes();
         UpdateUniqueAudioVolumes();
@@ -135,7 +130,7 @@ public class AudioManager : MonoBehaviour
     }
     AudioFileLibraryScriptableObject GetLibraryOfSoundName(string name)
     {
-        foreach (AudioFileLibraryScriptableObject library in new AudioFileLibraryScriptableObject[] { SFX,  Characters, Music })
+        foreach (AudioFileLibraryScriptableObject library in new AudioFileLibraryScriptableObject[] { SFX,   Music })
         {
             foreach (SoundWrapper sw in library.AudioLibrary)
             {
@@ -155,8 +150,6 @@ public class AudioManager : MonoBehaviour
                 return currentVolumeValues.sfxVolume;
             case SoundType.Music:
                 return currentVolumeValues.musicVolume;
-            case SoundType.Characters:
-                return currentVolumeValues.characterVolume;
             default:
                 return 1f;
         }
@@ -184,7 +177,7 @@ public class AudioManager : MonoBehaviour
     void AddToSounds(SoundWrapper[] wrapper)
     {
         List<Sound> soundsInSoundsArray = new List<Sound>();
-        foreach (Sound s in soundLibrary)
+        foreach (Sound s in _soundLibrary)
         {
             soundsInSoundsArray.Add(s);
         }
@@ -193,13 +186,13 @@ public class AudioManager : MonoBehaviour
             soundsInSoundsArray.Add(s.sound);
         }
 
-        soundLibrary = soundsInSoundsArray;
+        _soundLibrary = soundsInSoundsArray;
     }
     void SetupSounds()
     {
         //if there's thousands of sounds, it might cause some performance issues, but for a reasonable amount of sounds it should be fine.
         //If performance becomes an issue, consider using coroutine to load the sounds over multiple frames.
-        foreach (Sound s in soundLibrary)
+        foreach (Sound s in _soundLibrary)
         {
             if (s.source == null)
             {
@@ -222,7 +215,7 @@ public class AudioManager : MonoBehaviour
     {
         try
         {
-            foreach (Sound s in soundLibrary)
+            foreach (Sound s in _soundLibrary)
             {
                 if (s.name.ToUpper() == name.ToUpper())
                 {
@@ -234,11 +227,16 @@ public class AudioManager : MonoBehaviour
         {
             Debug.LogException(e);
         }
+        Debug.Log("no reference in library" + name);
 
         return null;
     }
     #endregion
-
+    public void QuickPlayAudio(string audioName, Vector2 pos)
+    {
+        SoundClipInfo soundClipInfo = new SoundClipInfo(pos, audioName);
+        PlayAudioClipInstance(soundClipInfo);
+    }
     //Use this function for single instance audio clips, like footsteps, gunshots, and the type of stuff that can be played multiple times at once without cutting each other off.
     //For music , or clips that should not be played multiple times at once, use PlayAudioClipUnique
     public void PlayAudioClipInstance(SoundClipInfo soundClipInfo)
@@ -265,22 +263,18 @@ public class AudioManager : MonoBehaviour
         }
 
         float originalPitch = soundReference.pitch;
-        soundClipInfo.soundClipAudioSource = CreateNewAudioSource(soundClipInfo.position,soundClipInfo.soundName);
+        soundClipInfo.soundClipAudioSource = GetAudioSource(soundClipInfo.position,soundClipInfo.soundName);
 
         soundClipInfo.soundClipAudioSource.volume = soundReference.volume;
         soundClipInfo.soundClipAudioSource.clip = soundReference.clip;
         soundClipInfo.soundClipAudioSource.spatialBlend = 1f;
         soundClipInfo.soundClipAudioSource.pitch = soundClipInfo.pitch * originalPitch;
         soundClipInfo.soundClipAudioSource.Play();
-        float length = soundReference.clip.length * ((Time.timeScale < 0.01f) ? 0.01f : Time.timeScale);
-        
-        if (soundClipInfo.fadeInDuration > 0)
-            StartCoroutine(FadeInAudioClip(soundClipInfo.soundClipAudioSource, soundClipInfo.fadeInDuration));
-        if(soundClipInfo.fadeOutDuration > 0)
-            StartCoroutine(FadeOutAudioClip(soundClipInfo.soundClipAudioSource, soundClipInfo.fadeOutDuration, false));
+        float length = soundReference.clip.length;
+        Debug.Log("Sound length: " + length);
 
         _soundInstanceList.Add(soundClipInfo);
-        yield return new WaitForSeconds(length / Mathf.Abs(soundClipInfo.soundClipAudioSource.pitch));
+        yield return new WaitForSecondsRealtime(length / Mathf.Abs(soundClipInfo.soundClipAudioSource.pitch));
         if (DebugMode)
         {
             Debug.Log("Sound stopped: " + soundReference.name +
@@ -289,25 +283,31 @@ public class AudioManager : MonoBehaviour
         }
 
         soundClipInfo.soundClipAudioSource.Stop();
-        UnityEngine.Object.Destroy(soundClipInfo.soundClipAudioSource.gameObject);
+        soundClipInfo.soundClipAudioSource.gameObject.SetActive(false);
         _soundInstanceList.Remove(soundClipInfo);
 
-        AudioSource CreateNewAudioSource(Vector2 position, string soundName = "")
+
+        AudioSource GetAudioSource(Vector2 position, string soundName = "")
         {
-            if (position == Vector2.zero)
-            {
-                GameObject audioListenerGameObject = FindAnyObjectByType<AudioListener>().gameObject;
-                GameObject gameObject = new GameObject("Audio Source (" + soundName + ")");
-                gameObject.transform.position = audioListenerGameObject.transform.position;
-                gameObject.transform.parent = audioListenerGameObject.transform;
-                return (AudioSource)gameObject.AddComponent(typeof(AudioSource));
-            }
-            else
+            AudioPool audioPool = GetAudioPool(soundName);
+            GameObject pooledObject = audioPool.GetInactiveObject();
+
+            if(pooledObject == null )
             {
                 GameObject gameObject = new GameObject("Audio Source (" + soundName + ")");
-                gameObject.transform.position = position;
-                return (AudioSource)gameObject.AddComponent(typeof(AudioSource));
+                audioPool.AddNewObject(gameObject);
+                pooledObject = gameObject;
+                pooledObject.AddComponent(typeof(AudioSource));
             }
+            pooledObject.transform.parent = this.transform;
+            pooledObject.SetActive(true);
+            pooledObject.transform.position = new Vector3(position.x, position.y, FindAnyObjectByType<AudioListener>().transform.position.z);
+            pooledObject.GetComponent<AudioSource>().rolloffMode = AudioRolloffMode.Linear;
+            pooledObject.GetComponent<AudioSource>().minDistance = 7f;
+            pooledObject.GetComponent<AudioSource>().maxDistance = 7.5f;
+
+
+            return pooledObject.GetComponent<AudioSource>();
         }
 
     }
@@ -351,7 +351,6 @@ public class AudioManager : MonoBehaviour
         }
         audioSourceGameObject = _persistentAudios[uniqueSoundClipInfo.uniqueTrackID];
         CopySoundReferenceValuesToAudioSource(FindSoundInReferenceLibrary(uniqueSoundClipInfo.soundName), audioSourceGameObject.source2);
-        StartCoroutine(FadeInFadeOutAudioClips(uniqueSoundClipInfo.soundName, audioSourceGameObject.source1, audioSourceGameObject.source2, uniqueSoundClipInfo.fadeInDuration, uniqueSoundClipInfo.previousSoundFadeOutDuration));
     }
     void CopySoundReferenceValuesToAudioSource(Sound reference, AudioSource source)
     {
@@ -370,53 +369,21 @@ public class AudioManager : MonoBehaviour
         source.spatialBlend = reference.source.spatialBlend;
         source.pitch = reference.pitch;
     }
-    public IEnumerator FadeInFadeOutAudioClips(string nextSoundName, AudioSource source1, AudioSource source2, float fadeInDuration = 0, float fadeOutDuration = 0)
-    {
-        if (source1 != null && source1.clip != null)
-            yield return FadeOutAudioClip(source1, fadeOutDuration);
-        CopySoundReferenceValuesToAudioSource(FindSoundInReferenceLibrary(nextSoundName), source1);
-        CopySoundReferenceValuesToAudioSource(FindSoundInReferenceLibrary(""), source2);
-        source1?.Play();
-        if (source1 != null && source1.clip != null)
-            yield return FadeInAudioClip(source1, fadeInDuration);
-    }
-    public IEnumerator FadeInAudioClip(AudioSource source, float fadeinDuration)
-    {
-        SoundType librarySoundType = GetLibraryOfSoundName(source.clip.name).AudioLibrarySoundType;
-        Sound reference = FindSoundInReferenceLibrary(source.clip.name);
 
-        float time = 0;
-        while (time < fadeinDuration && source != null)
-        {
-            source.volume = Mathf.Lerp(0, reference.volume * currentVolumeValues.masterVolume * GetSoundTypeVolume(librarySoundType), time / fadeinDuration);
-            time += Time.deltaTime;
-            yield return null;
-        }
-        source.volume = reference.volume * currentVolumeValues.masterVolume * GetSoundTypeVolume(librarySoundType);
-        yield return null;
-    }
-    public IEnumerator FadeOutAudioClip(AudioSource source, float fadeoutDuration, bool abrupt = true)
+    private AudioPool GetAudioPool(string audioName)
     {
-        if (!abrupt)
+        foreach (AudioPool pool in _audioPools)
         {
-            float length = source.clip.length * ((Time.timeScale < 0.01f) ? 0.01f : Time.timeScale) / Mathf.Abs(source.pitch);
-            yield return new WaitForSeconds(length - fadeoutDuration);
-        }
-        SoundType librarySoundType = GetLibraryOfSoundName(source.clip.name).AudioLibrarySoundType;
-        Sound reference = FindSoundInReferenceLibrary(source.clip.name);
-        if (source != null && source.clip != null)
-        {
-            float time = 0;
-            while (time < fadeoutDuration && source != null)
+            if (pool.soundName.ToUpper() == audioName.ToUpper())
             {
-                source.volume = Mathf.Lerp(reference.volume * currentVolumeValues.masterVolume * GetSoundTypeVolume(librarySoundType), 0, time / fadeoutDuration);
-                time += Time.deltaTime;
-                yield return null;
+                return pool;
             }
-            source.Stop();
-            source.volume = reference.volume * currentVolumeValues.masterVolume * GetSoundTypeVolume(librarySoundType);
         }
-        yield return null;
+
+        _audioPools.Add(new AudioPool(audioName));
+        return GetAudioPool(audioName);
+
+
     }
 }
 
@@ -425,8 +392,7 @@ namespace AudioManagerPackage
     public enum SoundType
     {
         SFX,
-        Music,
-        Characters,
+        Music
     }
     [System.Serializable]
     public class Sound
@@ -556,6 +522,34 @@ namespace AudioManagerPackage
             this.sfxVolume = sfxVolume;
             this.characterVolume = characterVolume;
             this.musicVolume = musicVolume;
+        }
+    }
+    [System.Serializable]
+    public class AudioPool
+    {
+        public string soundName;
+        public HashSet<GameObject> objects = new HashSet<GameObject>();
+
+        public AudioPool(string soundName)
+        {
+            this.soundName = soundName;
+        }
+
+        public GameObject GetInactiveObject()
+        {
+            foreach (GameObject obj in objects)
+            {
+                if (!obj.activeInHierarchy)
+                {
+                    return obj;
+                }
+            }
+            return null;
+        }
+
+        public void AddNewObject(GameObject objectToAdd)
+        {
+            objects.Add(objectToAdd);
         }
     }
 }

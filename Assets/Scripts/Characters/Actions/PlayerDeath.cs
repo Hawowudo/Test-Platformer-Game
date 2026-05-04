@@ -19,6 +19,8 @@ public class PlayerDeath : ActionStateLogic
         actionHandler.GetComponent<CombatEntity>().DisableHitbox();
         actionHandler.GetComponent<CombatEntity>().DisableHurtBox();
         DisableCollision(actionHandler);
+        PlayAudio(actionHandler);
+
     }
     public override void FrameUpdate(CharacterActionHandler actionHandler)
     {

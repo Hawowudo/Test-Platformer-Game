@@ -1,3 +1,4 @@
+using AudioManagerPackage;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -12,6 +13,7 @@ public class PlayerHit : ActionStateLogic
         actionHandler._blackboard.Set<float>("hittimer", 0);
 
         actionHandler._rigidBody2D.gravityScale = actionHandler._blackboard.Get<float>("originalgravity");
+        PlayHit(actionHandler);
     }
     public override void FrameUpdate(CharacterActionHandler actionHandler)
     {
@@ -36,5 +38,11 @@ public class PlayerHit : ActionStateLogic
     public override void PhysicsUpdate(CharacterActionHandler actionHandler)
     {
         base.PhysicsUpdate(actionHandler);
+    }
+    private void PlayHit(CharacterActionHandler actionHandler)
+    {
+        SoundClipInfo newSoundClipWithPosition = _actionAudio.DeepCopy();
+        newSoundClipWithPosition.position = actionHandler.transform.position;
+        AudioManager.instance.PlayAudioClipInstance(newSoundClipWithPosition);
     }
 }
