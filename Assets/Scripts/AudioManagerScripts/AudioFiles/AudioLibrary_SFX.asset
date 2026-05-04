@@ -15,27 +15,81 @@ MonoBehaviour:
   AudioLibrarySoundType: 0
   AudioLibrary:
   - sound:
-      name: WAHHSCARYNOISE
-      clip: {fileID: 8300000, guid: 54f127d0cd2115d4bba53dd083a9b4d1, type: 3}
-      volume: 0.1
+      name: STEP
+      clip: {fileID: 8300000, guid: 9f6aebd2b6f0d6145be3246c31ad1819, type: 3}
+      volume: 1
       newVolume: 0.1
       pitch: 1
       source: {fileID: 0}
       PlayOnAwake: 0
       Loop: 0
   - sound:
-      name: SFX_PICKUP_1
-      clip: {fileID: 8300000, guid: 1095e0f2bc6644a49ad361e69ca3c5a8, type: 3}
-      volume: 0.1
+      name: DEATH
+      clip: {fileID: 8300000, guid: e48944241ba960f4f86ad84085dbe530, type: 3}
+      volume: 1
       newVolume: 0.1
       pitch: 1
       source: {fileID: 0}
       PlayOnAwake: 0
       Loop: 0
   - sound:
-      name: BEEP
-      clip: {fileID: 8300000, guid: 2321495ed9c39044884b602b65151839, type: 3}
-      volume: 0.1
+      name: HURT
+      clip: {fileID: 8300000, guid: 4dcd93b0aa49f2f41bf74300184526f5, type: 3}
+      volume: 1
+      newVolume: 0.1
+      pitch: 1
+      source: {fileID: 0}
+      PlayOnAwake: 0
+      Loop: 0
+  - sound:
+      name: SWORDSLASH1
+      clip: {fileID: 8300000, guid: 14c716508cec42446a3256a5583d96ef, type: 3}
+      volume: 1
+      newVolume: 0.1
+      pitch: 1
+      source: {fileID: 0}
+      PlayOnAwake: 0
+      Loop: 0
+  - sound:
+      name: SWORDSLASH2
+      clip: {fileID: 8300000, guid: 91cf6d7fb63b612428692796628ab5b8, type: 3}
+      volume: 1
+      newVolume: 0.1
+      pitch: 1
+      source: {fileID: 0}
+      PlayOnAwake: 0
+      Loop: 0
+  - sound:
+      name: JUMP
+      clip: {fileID: 8300000, guid: 6060382f801f41943b00ea3fec4832fb, type: 3}
+      volume: 1
+      newVolume: 0.1
+      pitch: 1
+      source: {fileID: 0}
+      PlayOnAwake: 0
+      Loop: 0
+  - sound:
+      name: LAND
+      clip: {fileID: 8300000, guid: 99beec197dfd38f43af306d36069a21f, type: 3}
+      volume: 1
+      newVolume: 0.1
+      pitch: 1
+      source: {fileID: 0}
+      PlayOnAwake: 0
+      Loop: 0
+  - sound:
+      name: ATTACKINDICATOR
+      clip: {fileID: 8300000, guid: 91cf6d7fb63b612428692796628ab5b8, type: 3}
+      volume: 1
+      newVolume: 0.1
+      pitch: 1
+      source: {fileID: 0}
+      PlayOnAwake: 0
+      Loop: 0
+  - sound:
+      name: HEAL
+      clip: {fileID: 8300000, guid: e2d9236057146ef43a6ebf85f22649c8, type: 3}
+      volume: 1
       newVolume: 0.1
       pitch: 1
       source: {fileID: 0}
