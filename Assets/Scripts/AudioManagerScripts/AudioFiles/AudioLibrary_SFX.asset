@@ -95,3 +95,12 @@ MonoBehaviour:
       source: {fileID: 0}
       PlayOnAwake: 0
       Loop: 0
+  - sound:
+      name: WIN
+      clip: {fileID: 8300000, guid: 776bbdd2953c125438f2ac4967a0ae5d, type: 3}
+      volume: 1
+      newVolume: 0.1
+      pitch: 1
+      source: {fileID: 0}
+      PlayOnAwake: 0
+      Loop: 0

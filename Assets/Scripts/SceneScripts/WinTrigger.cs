@@ -6,6 +6,6 @@ public class WinTrigger : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D collision)
     {
         GameManager.Get().SwitchGameState(GameState.GameWin);
-
+        AudioManager.instance.QuickPlayAudio("WIN", transform.position);
     }
 }
