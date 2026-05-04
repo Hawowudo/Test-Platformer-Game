@@ -22,13 +22,14 @@ namespace VistaHandlerScripts
             }
         }
 
-        public void Move(float cameraX)
+        public void Move(Vector2 cameraPos)
         {
             Vector3 pos = layerTransform.position;
-            pos.x = cameraX * parallaxFactor;
+            pos.x = cameraPos.x * parallaxFactor;
+            pos.y = cameraPos.y;
             layerTransform.position = pos;
 
-            CheckLoop(cameraX);
+            CheckLoop(cameraPos.x);
         }
 
         private void CheckLoop(float cameraX)
@@ -86,11 +87,9 @@ namespace VistaHandlerScripts
 
         private void LateUpdate()
         {
-            float cameraX = _cameraTransform.position.x;
-
             foreach (VistaLayer layer in vistaLayers)
             {
-                layer.Move(cameraX);
+                layer.Move(_cameraTransform.position);
             }
         }
     }
