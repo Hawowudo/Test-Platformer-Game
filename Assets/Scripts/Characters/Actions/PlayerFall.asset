@@ -22,3 +22,4 @@ MonoBehaviour:
     soundClipAudioSource: {fileID: 0}
   fallGravity: 3
   fallGravityMultiplier: 2
+  coyoteTime: 0.2

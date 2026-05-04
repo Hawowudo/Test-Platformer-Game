@@ -7,6 +7,7 @@ public class PlayerFall : ActionStateLogic
     [Header("Fall Feel")]
     public float fallGravity = 3f;
     public float fallGravityMultiplier = 2f;
+    public float coyoteTime = .5f;
     public override void OnEnterState(
         CharacterActionHandler actionHandler)
     {
@@ -19,6 +20,12 @@ public class PlayerFall : ActionStateLogic
         actionHandler._blackboard.Set<float>("originalGravity", rb.gravityScale);
         rb.velocity = Vector2.zero;
         rb.gravityScale = fallGravity * fallGravityMultiplier;
+
+        if( !actionHandler.CheckPreviousState(actionHandler.GetState<PlayerJump>()) )
+        {
+            actionHandler._blackboard.Set<bool>("cancoyotetime", true);
+            actionHandler._blackboardTimer.AddTimerToBlackboard("coyotetime", 0f);
+        }
     }
 
 
@@ -33,6 +40,15 @@ public class PlayerFall : ActionStateLogic
             return;
         }
         CalculateMovement(actionHandler);
+
+        if ( actionHandler._blackboard.Get<float>("coyotetime") < coyoteTime 
+            && actionHandler._blackboard.Get<bool>("jumppressed")
+            && actionHandler._blackboard.Get<bool>("cancoyotetime")
+            )
+        {
+            actionHandler.ChangeState(actionHandler.GetState<PlayerJump>());
+            return;
+        }
         if (Time.frameCount % 30 == 0)
         {
             if (!GroundCheck(actionHandler))
@@ -64,6 +80,8 @@ public class PlayerFall : ActionStateLogic
         base.OnExitState(actionHandler);
 
         actionHandler._rigidBody2D.gravityScale = actionHandler._blackboard.Get<float>("originalGravity");
+        actionHandler._blackboard.Set<bool>("cancoyotetime", false);
+        actionHandler._blackboardTimer.StopTimer("coyotetime");
         PlayAudio(actionHandler);
     }
 

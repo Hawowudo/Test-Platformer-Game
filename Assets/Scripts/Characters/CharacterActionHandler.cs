@@ -12,6 +12,7 @@ public class CharacterActionHandler : MonoBehaviour
 
     public ActionStateLogic[] _switchableStates;
     [SerializeReference] public ActionStateLogic _currentState;
+    [SerializeReference] public ActionStateLogic _previousState;
     [SerializeReference] public ActionStateLogic _initialState;
 
     public bool debugMode;
@@ -51,11 +52,15 @@ public class CharacterActionHandler : MonoBehaviour
         if(debugMode)
             debugText.text = newState.GetType().Name;
         if(_currentState != null)
+        {
             _currentState.OnExitState(this);
+            _previousState = _currentState;
+        }
 
         _currentState = newState;
         _currentState.OnEnterState(this);
     }
+    //generic only for those objects that implements actionstatelogic
     public T GetState<T>() where T : ActionStateLogic
     {
         foreach (var state in _switchableStates)
@@ -87,6 +92,10 @@ public class CharacterActionHandler : MonoBehaviour
     public int GetSpriteDirection()
     {
         return GetComponent<SpriteRenderer>().flipX ? -1 : 1;
+    }
+    public bool CheckPreviousState(ActionStateLogic state)
+    {
+        return _previousState == state;
     }
 
     public void FlipSprite(int direction)
